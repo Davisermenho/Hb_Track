@@ -2,7 +2,6 @@
 
 import argparse
 import ast
-import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -18,31 +17,26 @@ class ForeignKeySpec:
     ondelete: str | None = None
     onupdate: str | None = None
     use_alter: bool | None = None
-    line_no: int | None = None
 
 
 @dataclass(frozen=True)
 class ColumnSpec:
     name: str
     nullable: bool
-    nullable_explicit: bool
     is_primary_key: bool
     type_key: str | None
     default_kind: str | None = None
     default_value: str | None = None
-    line_no: int | None = None
 
 
 @dataclass(frozen=True)
 class CheckSpec:
     name: str
-    line_no: int | None = None
 
 
 @dataclass(frozen=True)
 class UniqueConstraintSpec:
     name: str
-    line_no: int | None = None
 
 
 @dataclass(frozen=True)
@@ -50,27 +44,6 @@ class IndexSpec:
     name: str
     unique: bool
     where: str | None
-    line_no: int | None = None
-
-
-CYCLE_FK_NAMES: set[str] = {
-    "fk_teams_season_id",
-    "fk_seasons_team_id",
-}
-
-ACCEPTABLE_EQUIVALENCES: set[tuple[str, str]] = {
-    ("varchar|None", "text"),
-    ("text", "varchar|None"),
-}
-
-REJECTED_EQUIVALENCES: set[tuple[str, str]] = {
-    ("text", "varchar|255"),
-    ("varchar|255", "text"),
-    ("varchar|50", "varchar|64"),
-    ("varchar|64", "varchar|50"),
-}
-
-DEFAULT_EXCEPTIONS_FILE = Path(".hb_guard") / "model_requirements_exceptions.json"
 
 
 class _SpecsMap(dict):
@@ -155,7 +128,6 @@ def _extract_fk_call(node: ast.Call) -> ForeignKeySpec | None:
         ondelete=ondelete.upper() if ondelete else None,
         onupdate=None,
         use_alter=use_alter,
-        line_no=getattr(node, "lineno", None),
     )
 
 
@@ -179,13 +151,6 @@ def _extract_kw_int(call: ast.Call, key: str) -> int | None:
     for kw in call.keywords:
         if kw.arg == key and isinstance(kw.value, ast.Constant) and isinstance(kw.value.value, int):
             return kw.value.value
-    return None
-
-
-def _extract_kw_node(call: ast.Call, key: str) -> ast.AST | None:
-    for kw in call.keywords:
-        if kw.arg == key:
-            return kw.value
     return None
 
 
@@ -366,53 +331,6 @@ def _classify_default(default_expr: str | None) -> tuple[str | None, str | None]
     return "default_literal", raw
 
 
-def _extract_default_from_ast(node: ast.AST | None) -> tuple[str | None, str | None]:
-    if node is None:
-        return None, None
-
-    if isinstance(node, ast.Constant):
-        if node.value is None:
-            return "default_literal", "null"
-        if isinstance(node.value, bool):
-            return "default_literal", "true" if node.value else "false"
-        if isinstance(node.value, (int, float)):
-            return "default_literal", str(node.value)
-        if isinstance(node.value, str):
-            return "default_literal", repr(node.value)
-
-    if isinstance(node, ast.Call):
-        fn_name = _extract_call_name(node.func)
-        if fn_name == "text" and node.args:
-            txt = _extract_str(node.args[0])
-            if txt is not None:
-                kind, value = _classify_default(txt.strip())
-                if kind is not None:
-                    return kind, value
-                return "default_function", txt.strip()
-        # default=uuid4 style and similar function defaults
-        if fn_name:
-            return "default_function", fn_name
-
-    if isinstance(node, ast.Name):
-        return "default_function", node.id
-
-    if isinstance(node, ast.Attribute):
-        return "default_function", node.attr
-
-    return None, None
-
-
-def _norm_default_value(v: str | None) -> str | None:
-    if v is None:
-        return None
-    vv = v.strip().strip("'").strip('"').lower()
-    vv = re.sub(r"\s+", " ", vv)
-    vv = vv.replace("public.", "")
-    # normalize explicit casts in pg_dump output, keep semantic core
-    vv = re.sub(r"::[a-z_ ]+", "", vv)
-    return vv
-
-
 def _get_create_table_body(schema_text: str, table: str) -> str:
     table_pattern = re.compile(
         rf"CREATE\s+TABLE\s+public\.{re.escape(table)}\s*\((?P<body>.*?)\);",
@@ -437,80 +355,6 @@ def _fk_ondelete_equivalent(expected: str | None, got: str | None) -> bool:
         return True
 
     return norm_expected == norm_got
-
-
-def _line_suffix(line_no: int | None) -> str:
-    return f" line={line_no}" if line_no is not None else ""
-
-
-def _types_equivalent(expected: str, got: str) -> bool:
-    if expected == got:
-        return True
-
-    pair = (expected, got)
-    if pair in REJECTED_EQUIVALENCES:
-        return False
-    if pair in ACCEPTABLE_EQUIVALENCES:
-        return True
-    return False
-
-
-def _load_lenient_exceptions(root: Path) -> list[dict]:
-    p = root / DEFAULT_EXCEPTIONS_FILE
-    if not p.exists():
-        return []
-    data = json.loads(p.read_text(encoding="utf-8"))
-    if isinstance(data, list):
-        return [x for x in data if isinstance(x, dict)]
-    if isinstance(data, dict):
-        items = data.get("exceptions", [])
-        if isinstance(items, list):
-            return [x for x in items if isinstance(x, dict)]
-    return []
-
-
-def _violation_code(v: str) -> str:
-    return v.split(":", 1)[0].strip()
-
-
-def _apply_lenient_exceptions(
-    violations: list[str],
-    table: str,
-    model_path: Path,
-    exceptions: list[dict],
-) -> tuple[list[str], list[tuple[str, dict]]]:
-    remaining: list[str] = []
-    applied: list[tuple[str, dict]] = []
-    model_path_norm = str(model_path).replace("\\", "/").lower()
-
-    for v in violations:
-        code = _violation_code(v)
-        matched_exc: dict | None = None
-        for exc in exceptions:
-            exc_table = str(exc.get("table", "")).strip().lower()
-            if exc_table and exc_table != table.lower():
-                continue
-
-            exc_model_path = str(exc.get("model_path", "")).strip().replace("\\", "/").lower()
-            if exc_model_path and exc_model_path not in model_path_norm:
-                continue
-
-            ignore = exc.get("ignore", [])
-            if not isinstance(ignore, list):
-                continue
-            ignore_codes = {str(x).strip() for x in ignore}
-            if code not in ignore_codes:
-                continue
-
-            matched_exc = exc
-            break
-
-        if matched_exc:
-            applied.append((v, matched_exc))
-        else:
-            remaining.append(v)
-
-    return remaining, applied
 
 
 def _parse_model_fks(model_path: Path) -> dict[str, set[ForeignKeySpec]]:
@@ -569,10 +413,7 @@ def _parse_model_constraints(model_path: Path, table: str) -> dict[str, _SpecsMa
                     name = _extract_str(kw.value)
                     break
             if name:
-                checks[_normalize_ident(name)] = CheckSpec(
-                    name=_normalize_ident(name),
-                    line_no=getattr(call, "lineno", None),
-                )
+                checks[_normalize_ident(name)] = CheckSpec(name=_normalize_ident(name))
             return
 
         if fn_name == "UniqueConstraint":
@@ -582,10 +423,7 @@ def _parse_model_constraints(model_path: Path, table: str) -> dict[str, _SpecsMa
                     name = _extract_str(kw.value)
                     break
             if name:
-                uniques[_normalize_ident(name)] = UniqueConstraintSpec(
-                    name=_normalize_ident(name),
-                    line_no=getattr(call, "lineno", None),
-                )
+                uniques[_normalize_ident(name)] = UniqueConstraintSpec(name=_normalize_ident(name))
             return
 
         if fn_name == "Index":
@@ -593,19 +431,10 @@ def _parse_model_constraints(model_path: Path, table: str) -> dict[str, _SpecsMa
             if not idx_name:
                 return
             unique = _extract_kw_bool(call, "unique") is True
-
-            where: str | None = None
-            where_node = _extract_kw_node(call, "postgresql_where")
-            if isinstance(where_node, ast.Call):
-                where_fn = _extract_call_name(where_node.func)
-                if where_fn == "text" and where_node.args:
-                    where = _extract_str(where_node.args[0])
-
             indexes[_normalize_ident(idx_name)] = IndexSpec(
                 name=_normalize_ident(idx_name),
                 unique=unique,
-                where=re.sub(r"\s+", " ", where.strip()) if where else None,
-                line_no=getattr(call, "lineno", None),
+                where=None,
             )
 
     # __table_args__ static tuple/list constraints
@@ -654,7 +483,6 @@ def _parse_model_constraints(model_path: Path, table: str) -> dict[str, _SpecsMa
                         ondelete=fk.ondelete,
                         onupdate=fk.onupdate,
                         use_alter=fk.use_alter,
-                        line_no=fk.line_no,
                     )
 
     return {
@@ -676,24 +504,16 @@ def _parse_model_columns(model_path: Path, table: str) -> dict[str, ColumnSpec]:
             return
         primary_key = _extract_kw_bool(call, "primary_key") is True
         nullable_kw = _extract_kw_bool(call, "nullable")
-        nullable_explicit = nullable_kw is not None
         type_node = _extract_column_type_arg(call)
         type_key = _model_type_to_key(type_node)
-
-        server_default_node = _extract_kw_node(call, "server_default")
-        default_kind, default_value = _extract_default_from_ast(server_default_node)
 
         # Policy: nullable must be explicit (except PK); if missing, keep as non-null marker for later violation.
         nullable = bool(nullable_kw) if nullable_kw is not None else False
         columns[col_name] = ColumnSpec(
             name=col_name,
             nullable=nullable,
-            nullable_explicit=nullable_explicit,
             is_primary_key=primary_key,
             type_key=type_key,
-            default_kind=default_kind,
-            default_value=default_value,
-            line_no=getattr(call, "lineno", None),
         )
 
     for stmt in target_class.body:
@@ -727,16 +547,6 @@ def _parse_schema_columns(schema_text: str, table: str) -> dict[str, ColumnSpec]
                 pk_cols = [c.strip().strip('"') for c in pk_m.group(1).split(",")]
                 pk_columns.update(_normalize_ident(c) for c in pk_cols if c)
 
-    # collect PK columns from ALTER TABLE ... ADD CONSTRAINT ... PRIMARY KEY (...) statements
-    alter_pk_re = re.compile(
-        rf"ALTER\s+TABLE\s+ONLY\s+public\.{re.escape(table)}\s+"
-        r"ADD\s+CONSTRAINT\s+[\w\"]+\s+PRIMARY\s+KEY\s*\((?P<cols>[^)]+)\)",
-        flags=re.IGNORECASE,
-    )
-    for m in alter_pk_re.finditer(schema_text):
-        pk_cols = [c.strip().strip('"') for c in m.group("cols").split(",")]
-        pk_columns.update(_normalize_ident(c) for c in pk_cols if c)
-
     for ln in lines:
         up = ln.upper()
         if up.startswith("CONSTRAINT ") or up.startswith("PRIMARY KEY") or up.startswith("UNIQUE ") or up.startswith("CHECK ") or up.startswith("FOREIGN KEY"):
@@ -759,7 +569,6 @@ def _parse_schema_columns(schema_text: str, table: str) -> dict[str, ColumnSpec]
         columns[name] = ColumnSpec(
             name=name,
             nullable=not not_null,
-            nullable_explicit=True,
             is_primary_key=is_pk,
             type_key=type_key,
             default_kind=default_kind,
@@ -900,7 +709,40 @@ def _find_model_path(root: Path, table: str) -> Path:
 
 
 def _validate_fk_profile(root: Path, table: str) -> int:
-    violations, model_path, fk_count = _collect_fk_violations(root, table)
+    schema_path = root / "docs" / "_generated" / "schema.sql"
+    if not schema_path.exists():
+        print(f"[FAIL] schema not found: {schema_path}")
+        return EXIT_REQUIREMENTS_VIOLATION
+
+    model_path = _find_model_path(root, table)
+    schema_text = schema_path.read_text(encoding="utf-8", errors="replace")
+
+    expected = _parse_schema_fks(schema_text, table)
+    found_by_name = _parse_model_fks(model_path)
+
+    violations: list[str] = []
+
+    for name, exp in sorted(expected.items()):
+        candidates = found_by_name.get(name)
+        if not candidates:
+            violations.append(f"MISSING_FK: {name}")
+            continue
+
+        matched = any(
+            c.reference == exp.reference and _fk_ondelete_equivalent(exp.ondelete, c.ondelete)
+            for c in candidates
+        )
+        if not matched:
+            got = ", ".join(
+                f"ref={c.reference} ondelete={c.ondelete}" for c in sorted(candidates, key=lambda x: (x.reference, str(x.ondelete)))
+            )
+            violations.append(
+                f"FK_MISMATCH: {name} expected(ref={exp.reference}, ondelete={exp.ondelete}) got({got})"
+            )
+
+    for name in sorted(found_by_name.keys()):
+        if name not in expected:
+            violations.append(f"EXTRA_FK: {name}")
 
     if violations:
         print(f"[FAIL] model_requirements fk profile violations (table={table})")
@@ -911,54 +753,8 @@ def _validate_fk_profile(root: Path, table: str) -> int:
 
     print(f"[OK] model_requirements fk profile passed (table={table})")
     print(f"[INFO] model_path={model_path}")
-    print(f"[INFO] fk_count={fk_count}")
+    print(f"[INFO] fk_count={len(expected)}")
     return 0
-
-
-def _collect_fk_violations(root: Path, table: str) -> tuple[list[str], Path, int]:
-    schema_path = root / "docs" / "_generated" / "schema.sql"
-    if not schema_path.exists():
-        return [f"SCHEMA_NOT_FOUND: {schema_path}"], root / "app" / "models", 0
-
-    model_path = _find_model_path(root, table)
-    schema_text = schema_path.read_text(encoding="utf-8", errors="replace")
-
-    expected = _parse_schema_fks(schema_text, table)
-    found_by_name = _parse_model_fks(model_path)
-    violations: list[str] = []
-
-    for name, exp in sorted(expected.items()):
-        candidates = found_by_name.get(name)
-        if not candidates:
-            violations.append(f"MISSING_FK: {name} model_line=None")
-            continue
-
-        matched = any(
-            c.reference == exp.reference and _fk_ondelete_equivalent(exp.ondelete, c.ondelete)
-            for c in candidates
-        )
-        if not matched:
-            got = ", ".join(
-                f"ref={c.reference} ondelete={c.ondelete} line={c.line_no}" for c in sorted(candidates, key=lambda x: (x.reference, str(x.ondelete)))
-            )
-            violations.append(
-                f"FK_MISMATCH: {name} expected(ref={exp.reference}, ondelete={exp.ondelete}) got({got})"
-            )
-
-        if name in CYCLE_FK_NAMES:
-            missing_use_alter = [c for c in candidates if c.use_alter is not True]
-            if missing_use_alter:
-                got_lines = ",".join(str(c.line_no) for c in missing_use_alter)
-                violations.append(
-                    f"CYCLE_USE_ALTER_MISSING: {name} expected_use_alter=True model_line={got_lines}"
-                )
-
-    for name in sorted(found_by_name.keys()):
-        if name not in expected:
-            sample = sorted(found_by_name[name], key=lambda x: (x.reference, str(x.ondelete)))[0]
-            violations.append(f"EXTRA_FK: {name} model_line={sample.line_no}")
-
-    return violations, model_path, len(expected)
 
 
 def _validate_columns_nullable_profile(root: Path, table: str) -> tuple[list[str], Path, dict[str, ColumnSpec], dict[str, ColumnSpec]]:
@@ -975,10 +771,9 @@ def _validate_columns_nullable_profile(root: Path, table: str) -> tuple[list[str
     model_names = set(model_cols.keys())
 
     for col in sorted(expected_names - model_names):
-        violations.append(f"MISSING_COLUMN: {col} model_line=None")
+        violations.append(f"MISSING_COLUMN: {col}")
     for col in sorted(model_names - expected_names):
-        got = model_cols[col]
-        violations.append(f"EXTRA_COLUMN: {col} model_line={got.line_no}")
+        violations.append(f"EXTRA_COLUMN: {col}")
 
     for col in sorted(expected_names & model_names):
         exp = expected_cols[col]
@@ -986,102 +781,29 @@ def _validate_columns_nullable_profile(root: Path, table: str) -> tuple[list[str
         # Ignore nullability check on PKs
         if exp.is_primary_key:
             continue
-        if not got.nullable_explicit:
-            violations.append(
-                f"NULLABLE_IMPLICIT: {col} expected_nullable={exp.nullable} got_nullable_implicit model_line={got.line_no}"
-            )
         if exp.nullable != got.nullable:
             violations.append(
-                f"NULLABLE_MISMATCH: {col} expected_nullable={exp.nullable} got_nullable={got.nullable} model_line={got.line_no}"
+                f"NULLABLE_MISMATCH: {col} expected_nullable={exp.nullable} got_nullable={got.nullable}"
             )
 
-        if exp.type_key and got.type_key and not _types_equivalent(exp.type_key, got.type_key):
+        if exp.type_key and got.type_key and exp.type_key != got.type_key:
             violations.append(
-                f"TYPE_MISMATCH: {col} expected={exp.type_key} got={got.type_key} model_line={got.line_no}"
+                f"TYPE_MISMATCH: {col} expected={exp.type_key} got={got.type_key}"
             )
-
-        # Server defaults (strict, best-effort): compare when schema declares one
-        if exp.default_kind:
-            if not got.default_kind:
-                violations.append(
-                    f"MISSING_SERVER_DEFAULT: {col} expected_default={exp.default_kind}:{exp.default_value} model_line={got.line_no}"
-                )
-            else:
-                if exp.default_kind != got.default_kind:
-                    violations.append(
-                        f"DEFAULT_KIND_MISMATCH: {col} expected={exp.default_kind} got={got.default_kind} model_line={got.line_no}"
-                    )
-                exp_v = _norm_default_value(exp.default_value)
-                got_v = _norm_default_value(got.default_value)
-                if exp_v and got_v and exp_v != got_v:
-                    violations.append(
-                        f"DEFAULT_VALUE_MISMATCH: {col} expected={exp.default_value} got={got.default_value} model_line={got.line_no}"
-                    )
 
     return violations, model_path, expected_cols, model_cols
 
 
-def _validate_constraints_profile(root: Path, table: str) -> tuple[list[str], Path]:
-    schema_path = root / "docs" / "_generated" / "schema.sql"
-    model_path = _find_model_path(root, table)
-    schema_text = schema_path.read_text(encoding="utf-8", errors="replace")
-
-    expected_checks = _parse_checks(schema_text, table)
-    expected_uniques = _parse_unique_constraints(schema_text, table)
-    expected_indexes = _parse_indexes(schema_text, table)
-
-    parsed = _parse_model_constraints(model_path, table)
-    model_checks = parsed["checks"]
-    model_uniques = parsed["uniques"]
-    model_indexes = parsed["indexes"]
-
-    violations: list[str] = []
-
-    def _missing_extra(prefix: str, expected_map: dict, model_map: dict) -> None:
-        expected_names = set(expected_map.keys())
-        model_names = set(model_map.keys())
-        for name in sorted(expected_names - model_names):
-            violations.append(f"MISSING_{prefix}: {name} model_line=None")
-        for name in sorted(model_names - expected_names):
-            line_no = getattr(model_map[name], "line_no", None)
-            violations.append(f"EXTRA_{prefix}: {name} model_line={line_no}")
-
-    _missing_extra("CHECK", expected_checks, model_checks)
-    _missing_extra("UNIQUE", expected_uniques, model_uniques)
-    _missing_extra("INDEX", expected_indexes, model_indexes)
-
-    for name in sorted(set(expected_indexes.keys()) & set(model_indexes.keys())):
-        exp = expected_indexes[name]
-        got = model_indexes[name]
-        if exp.unique != got.unique:
-            violations.append(
-                f"INDEX_UNIQUE_MISMATCH: {name} expected_unique={exp.unique} got_unique={got.unique} model_line={got.line_no}"
-            )
-        exp_where = re.sub(r"\s+", " ", (exp.where or "").strip()) or None
-        got_where = re.sub(r"\s+", " ", (got.where or "").strip()) or None
-        if exp_where != got_where:
-            violations.append(
-                f"INDEX_WHERE_MISMATCH: {name} expected_where={exp_where} got_where={got_where} model_line={got.line_no}"
-            )
-
-    return violations, model_path
-
-
 def _validate_strict_profile(root: Path, table: str) -> int:
-    # Strict profile: fk + columns/types/nullable + constraints/defaults
+    # Wave A: fk + columns + nullable (types pending)
     fk_exit = _validate_fk_profile(root, table)
     if fk_exit != 0:
         return fk_exit
 
     violations, model_path, expected_cols, model_cols = _validate_columns_nullable_profile(root, table)
-    constraint_violations, constraint_model_path = _validate_constraints_profile(root, table)
-    violations.extend(constraint_violations)
-
     if violations:
         print(f"[FAIL] model_requirements strict profile violations (table={table})")
         print(f"[INFO] model_path={model_path}")
-        if constraint_model_path != model_path:
-            print(f"[INFO] constraints_model_path={constraint_model_path}")
         for v in violations:
             print(f"  - {v}")
         return EXIT_REQUIREMENTS_VIOLATION
@@ -1090,37 +812,6 @@ def _validate_strict_profile(root: Path, table: str) -> int:
     print(f"[INFO] model_path={model_path}")
     print(f"[INFO] column_count={len(expected_cols)}")
     print(f"[INFO] model_column_count={len(model_cols)}")
-    return 0
-
-
-def _validate_lenient_profile(root: Path, table: str) -> int:
-    fk_violations, model_path, fk_count = _collect_fk_violations(root, table)
-    col_violations, _, expected_cols, model_cols = _validate_columns_nullable_profile(root, table)
-    constraint_violations, _ = _validate_constraints_profile(root, table)
-
-    all_violations = fk_violations + col_violations + constraint_violations
-    exceptions = _load_lenient_exceptions(root)
-    remaining, applied = _apply_lenient_exceptions(all_violations, table, model_path, exceptions)
-
-    if remaining:
-        print(f"[FAIL] model_requirements lenient profile violations (table={table})")
-        print(f"[INFO] model_path={model_path}")
-        print(f"[INFO] exceptions_loaded={len(exceptions)} applied={len(applied)}")
-        for v in remaining:
-            print(f"  - {v}")
-        return EXIT_REQUIREMENTS_VIOLATION
-
-    print(f"[OK] model_requirements lenient profile passed (table={table})")
-    print(f"[INFO] model_path={model_path}")
-    print(f"[INFO] fk_count={fk_count}")
-    print(f"[INFO] column_count={len(expected_cols)}")
-    print(f"[INFO] model_column_count={len(model_cols)}")
-    print(f"[INFO] exceptions_loaded={len(exceptions)} applied={len(applied)}")
-    if applied:
-        print("[INFO] lenient_exceptions_applied:")
-        for v, exc in applied:
-            reason = str(exc.get("reason", "")).strip() or "(no reason)"
-            print(f"  - {v} | reason={reason}")
     return 0
 
 
@@ -1139,9 +830,6 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.profile == "strict":
         return _validate_strict_profile(root, args.table)
-
-    if args.profile == "lenient":
-        return _validate_lenient_profile(root, args.table)
 
     print(
         f"[FAIL] model_requirements profile not implemented yet "

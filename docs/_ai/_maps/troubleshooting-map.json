@@ -1,0 +1,66 @@
+{
+  "version": "1.0",
+  "source": "docs/_canon/09_TROUBLESHOOTING_GUARD_PARITY.md",
+  "exit_codes": {
+    "2": {
+      "description": "Parity Structural Diffs",
+      "symptoms": [],
+      "causes": [
+        "Migration pendente não aplicada",
+        "Model alterado sem migration correspondente",
+        "Schema PostgreSQL alterado manualmente (fora de Alembic)",
+        "Drift entre branches (merge incorreto)",
+        "`modify_nullable`: Problema de NOT NULL ↔ nullable",
+        "`modify_type`: Tipo de coluna incompatível",
+        "`add_column` / `drop_column`: Coluna adicionada/removida",
+        "`add_constraint` / `drop_constraint`: Constraint (FK, CHECK, UNIQUE) modificada"
+      ],
+      "solutions": [
+        "**Exit Codes:** `docs/references/exit_codes.md` (seção Exit Code 2)",
+        "**Scripts:**"
+      ]
+    },
+    "3": {
+      "description": "Guard Violations",
+      "symptoms": [],
+      "causes": [
+        "A modificação em `app/routes/teams.py` é intencional?",
+        "Foi causada por autogen (acidental)?",
+        "É parte da correção ou efeito colateral?"
+      ],
+      "solutions": [
+        "**Exit Codes:** `docs/references/exit_codes.md` (seção Exit Code 3)",
+        "**Scripts:**",
+        "**Comandos Aprovados:** `docs/_canon/08_APPROVED_COMMANDS.md` (seção Guard & Baseline)"
+      ]
+    },
+    "4": {
+      "description": "Requirements Violations",
+      "symptoms": [],
+      "causes": [],
+      "solutions": [
+        "**Exit Codes:** `docs/references/exit_codes.md` (seção Exit Code 4 com exemplos de fix)",
+        "**Scripts:**",
+        "**ADR:** `docs/ADR/013-ADR-MODELS.md` (critérios de validação detalhados)"
+      ]
+    },
+    "1": {
+      "description": "Internal Error / Crash",
+      "symptoms": [],
+      "causes": [
+        "Arquivo não encontrado (schema.sql, model.py)",
+        "Erro de sintaxe Python",
+        "Dependência faltando",
+        "Problema de permissão"
+      ],
+      "solutions": [
+        "**Exit Codes:** `docs/references/exit_codes.md` (seção Exit Code 1)",
+        "PowerShell: <versão>",
+        "Python: <versão>",
+        "Git: <versão>",
+        "[arquivos de log anexados]",
+        "[screenshots se relevantes]"
+      ]
+    }
+  }
+}

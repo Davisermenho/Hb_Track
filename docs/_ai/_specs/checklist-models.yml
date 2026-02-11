@@ -1,0 +1,12 @@
+source: docs/execution_tasks/CHECKLIST-CANONICA-MODELS.md
+steps:
+- id: STEP_0
+  name: Definir Schema (DDL)
+  required: true
+- id: STEP_1
+  name: Agent Guard (Baseline)
+  required: true
+- id: STEP_2
+  name: Parity Pre-Check
+  required: true
+version: '1.0'

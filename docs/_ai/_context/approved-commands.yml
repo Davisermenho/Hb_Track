@@ -1,0 +1,439 @@
+categories:
+  Configuração Crítica: []
+  Guard System: []
+  Migrations: []
+  SSOT Gerados (Derivados):
+  - "# Exemplo para gate\n$expectedPath = \"Hb Track - Backend\"\n$currentPath = Get-Location\n\
+    if ($currentPath -notmatch [regex]::Escape($expectedPath)) {\n    Write-Host \"\
+    [ERROR] Wrong CWD. Expected: *\\$expectedPath, Got: $currentPath\" -ForegroundColor\
+    \ Red\n    exit 1\n}"
+  - '# ✅ CORRETO
+
+    $output = & .\scripts\models_autogen_gate.ps1 -Table "athletes" 2>&1
+
+    $exitCode = $LASTEXITCODE  # Captura imediata
+
+    $output | Out-File log.txt # Pipeline APÓS captura
+
+
+    # ❌ ERRADO (Tee-Object altera $LASTEXITCODE)
+
+    & .\scripts\models_autogen_gate.ps1 -Table "athletes" 2>&1 | Tee-Object -FilePath
+    log.txt
+
+    $exitCode = $LASTEXITCODE  # Valor incorreto!'
+  - "# Validação obrigatória antes de gates\n$status = git status --porcelain\nif\
+    \ ($status) {\n    Write-Host \"[ERROR] Repository must be clean before execution\"\
+    \ -ForegroundColor Red\n    Write-Host \"Uncommitted changes:\" -ForegroundColor\
+    \ Yellow\n    git status --porcelain\n    exit 3  # Guard violation\n}"
+  - git status --porcelain
+  - 'PS C:\HB TRACK\Hb Track - Backend> git status --porcelain
+
+    M app/models/athletes.py
+
+    M docs/_generated/parity_report.json
+
+    ?? test_temp.tmp'
+  - 'git diff <file>
+
+    git diff --stat              # Resumo de mudanças (linhas +/-)
+
+    git diff --cached <file>     # Diff de staged changes'
+  - 'PS> git diff app/models/athletes.py
+
+    - season_id: Mapped[str] = mapped_column(String)
+
+    + season_id: Mapped[int] = mapped_column(Integer, ForeignKey("seasons.id"))'
+  - 'git log --oneline -n <N>
+
+    git log --oneline --graph -n <N>    # Com grafo de branches
+
+    git log -1 --stat                    # Último commit com estatísticas'
+  - 'PS> git log --oneline -n 5
+
+    09cdbeb chore(guard): refresh baseline after autogen patch
+
+    b677c31 feat(autogen): detect and remove duplicate __table_args__
+
+    46d04e8 fix(models): remove duplicate __table_args__ in competition_season
+
+    c6947bd chore(guard): refresh baseline after autogen updates
+
+    70e6b22 test: person.py after autogen (idempotence checkpoint)'
+  - 'git show <commit>
+
+    git show <commit> --stat               # Apenas estatísticas
+
+    git show <commit>:<file>               # Conteúdo de arquivo nesse commit'
+  - 'PS> git show 09cdbeb
+
+    commit 09cdbeb...
+
+    Author: Davi <...>
+
+    Date: 2026-02-10
+
+
+    chore(guard): refresh baseline after autogen patch
+
+
+    diff --git a/.hb_guard/baseline.json b/.hb_guard/baseline.json
+
+    ...'
+  - 'git add <file>
+
+    git add -A <path>     # Adiciona TODOS os arquivos em path (cuidado!)
+
+    git add -u            # Adiciona apenas tracked files modificados'
+  - 'PS> git add app/models/athletes.py
+
+    PS> git status --porcelain
+
+    M  app/models/athletes.py  # "M " (espaço após M) = staged'
+  - 'git commit -m "tipo(escopo): mensagem"
+
+    git commit -m "$(cat <<''EOF''
+
+    mensagem multilinha
+
+    com detalhes
+
+
+    Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+
+    EOF
+
+    )"'
+  - "PS> git commit -m \"fix(models): correct athletes.season_id type via autogen\"\
+    \n[main 12ab34c] fix(models): correct athletes.season_id type via autogen\n 1\
+    \ file changed, 2 insertions(+), 2 deletions(-)"
+  - 'git restore -- <file>
+
+    git restore --staged -- <file>    # Remove do staging (não reverte working tree)
+
+    git restore -- <path>              # Restaura todos os arquivos em path'
+  - '# Limpeza de artefatos gerados
+
+    PS> git restore -- "docs/_generated/alembic_state.txt"
+
+    PS> git restore -- "docs/_generated/manifest.json"
+
+    PS> git restore -- "docs/_generated/schema.sql"
+
+    PS> git status --porcelain
+
+    # Output vazio (artefatos revertidos)'
+  - '.\scripts\models_autogen_gate.ps1 -Table <name> -Profile strict
+
+    .\scripts\models_autogen_gate.ps1 -Table <name> -Profile fk
+
+    .\scripts\models_autogen_gate.ps1 -Table <name> -Profile strict -AllowCycleWarning
+
+    .\scripts\models_autogen_gate.ps1 -Table <name> -Allow "path/to/file.py"'
+  - 'PS C:\HB TRACK\Hb Track - Backend> .\scripts\models_autogen_gate.ps1 -Table "athletes"
+    -Profile strict
+
+    [GUARD] PASS (no protected files modified)
+
+    [PARITY] Running Alembic compare...
+
+    [PARITY] PASS (no structural diffs)
+
+    [AUTOGEN] Applying corrections...
+
+    [AUTOGEN] Fixed: TYPE_MISMATCH: season_id (String → Integer)
+
+    [REQUIREMENTS] Running validation...
+
+    [REQUIREMENTS] PASS (all constraints satisfied)
+
+    ✅ ALL GATES PASSED — Model is 100% conformant
+
+    ExitCode: 0'
+  - '.\scripts\parity_gate.ps1 -Table <name>
+
+    .\scripts\parity_gate.ps1 -Table <name> -SkipDocsRegeneration'
+  - "PS> .\\scripts\\parity_gate.ps1 -Table \"athletes\" -SkipDocsRegeneration\n[GUARD]\
+    \ PASS\n[PARITY] Scanning athletes...\n[PARITY] FAIL (exit=2)\n  - modify_type(athletes,\
+    \ 'season_id', String → Integer)\nExitCode: 2"
+  - '# Scan-only (dry-run)
+
+    .\scripts\models_batch.ps1 -DryRun
+
+    .\scripts\models_batch.ps1 -SkipGate             # Alias legado
+
+
+    # Full execution (scan + fix)
+
+    .\scripts\models_batch.ps1
+
+    .\scripts\models_batch.ps1 -SkipRefresh          # Usa schema.sql existente
+
+    .\scripts\models_batch.ps1 -Profile strict
+
+    .\scripts\models_batch.ps1 -FailFast:$false      # Continua após erros'
+  - "PS> .\\scripts\\models_batch.ps1 -DryRun -SkipRefresh\n[2026-02-10 14:32:00]\
+    \ ============ MODELS BATCH START ============\n[2026-02-10 14:32:00] Config:\
+    \ Profile=strict, SkipRefresh=True, SkipGate=True\n[2026-02-10 14:32:01] PHASE\
+    \ 1: SSOT Refresh - SKIPPED\n[2026-02-10 14:32:01] PHASE 2: Discovery - 15 tables\
+    \ found\n[2026-02-10 14:32:01] PHASE 3: Scan - START\n[2026-02-10 14:32:01] [1/15]\
+    \ athletes - PASS (exit=0)\n[2026-02-10 14:32:05] [2/15] teams - FAIL (exit=4)\n\
+    \  - VIOLATION: TYPE_MISMATCH: season_id expected=Integer got=String\n[2026-02-10\
+    \ 14:35:00] PHASE 3: Scan - COMPLETE (PASS: 10, FAIL: 3, SKIP: 2)\n============\
+    \ SUMMARY ============\nTotal tables: 15\nPASS: 10\nFAIL: 3 (teams, seasons, attendance)\n\
+    SKIP_NO_MODEL: 2\nExit code: 0\n================================"
+  - 'PS> .\scripts\models_batch.ps1 -SkipRefresh
+
+    [PHASE 3: Scan] PASS: 10, FAIL: 3, SKIP: 2
+
+    [PHASE 4: Fix - START] (3 tables)
+
+    [1/3] teams - Running gate (profile=fk)
+
+    [1/3] teams - FIXED (exit=0)
+
+    [2/3] seasons - Running gate (profile=fk)
+
+    [2/3] seasons - PARITY FAIL (exit=2)
+
+    [ABORT] Fail-fast triggered. Manual intervention required.
+
+    ExitCode: 2'
+  - '# Forma completa (recomendada)
+
+    powershell -NoProfile -ExecutionPolicy Bypass -File "C:\HB TRACK\scripts\inv.ps1"
+    refresh
+
+
+    # Forma curta (se CWD = repo root)
+
+    .\scripts\inv.ps1 refresh'
+  - 'PS C:\HB TRACK> .\scripts\inv.ps1 refresh
+
+    [SSOT] Regenerating artifacts...
+
+    [SSOT] Running pg_dump...
+
+    [SSOT] Generated: docs/_generated/schema.sql (1.2MB)
+
+    [SSOT] Generating OpenAPI spec...
+
+    [SSOT] Generated: docs/_generated/openapi.json (450KB)
+
+    [SSOT] Extracting Alembic state...
+
+    [SSOT] Generated: docs/_generated/alembic_state.txt
+
+    [SSOT] Creating manifest...
+
+    [SSOT] Generated: docs/_generated/manifest.json
+
+    ✅ SSOT refresh complete
+
+    ExitCode: 0'
+  - '.\venv\Scripts\python.exe scripts\agent_guard.py snapshot --root . --out ".hb_guard/baseline.json"
+
+    .\venv\Scripts\python.exe scripts\agent_guard.py snapshot baseline  # Alias curto'
+  - 'PS> .\venv\Scripts\python.exe scripts\agent_guard.py snapshot baseline
+
+    [GUARD] Scanning protected files...
+
+    [GUARD] Found 47 files
+
+    [GUARD] Computing SHA256 hashes...
+
+    [GUARD] Baseline updated: .hb_guard/baseline.json
+
+    ExitCode: 0
+
+
+    PS> git status --porcelain
+
+    M .hb_guard/baseline.json'
+  - '.\venv\Scripts\python.exe scripts\agent_guard.py check --root . --baseline ".hb_guard\baseline.json"
+
+    .\venv\Scripts\python.exe scripts\agent_guard.py check baseline  # Alias curto'
+  - 'PS> .\venv\Scripts\python.exe scripts\agent_guard.py check baseline
+
+    [GUARD] Checking baseline...
+
+    [GUARD] PASS (no protected files modified)
+
+    ExitCode: 0'
+  - "PS> .\\venv\\Scripts\\python.exe scripts\\agent_guard.py check baseline\n[GUARD]\
+    \ Checking baseline...\n[GUARD] FAIL (exit=3)\nModified protected files:\n  -\
+    \ app/routes/teams.py\nExitCode: 3"
+  - '.\venv\Scripts\python.exe scripts\model_requirements.py --table <name> --profile
+    strict
+
+    .\venv\Scripts\python.exe scripts\model_requirements.py --table <name> --profile
+    fk
+
+    .\venv\Scripts\python.exe scripts\model_requirements.py --table <name> --profile
+    lenient'
+  - 'PS> .\venv\Scripts\python.exe scripts\model_requirements.py --table athletes
+    --profile strict
+
+    [REQUIREMENTS] Parsing schema.sql...
+
+    [REQUIREMENTS] Parsing app/models/athlete.py...
+
+    [REQUIREMENTS] Validating: types, nullable, FK, CHECK, INDEX, server_default...
+
+    [REQUIREMENTS] PASS (no violations)
+
+    ExitCode: 0'
+  - "PS> .\\venv\\Scripts\\python.exe scripts\\model_requirements.py --table attendance\
+    \ --profile strict\n[REQUIREMENTS] FAIL (exit=4)\nViolations (strict profile):\n\
+    \  - MISSING_SERVER_DEFAULT: is_medical_restriction expected_default=default_literal:false\
+    \ model_line=174\n  - TYPE_MISMATCH: date expected=date|None got=varchar|20 model_line=35\n\
+    \  - NULLABLE_MISMATCH: athlete_id expected=NOT NULL got=omitted model_line=42\n\
+    ExitCode: 4"
+  - '.\scripts\parity_scan.ps1 -TableFilter <name>
+
+    .\scripts\parity_scan.ps1 -TableFilter <name> -SkipDocsRegeneration'
+  - 'PS> .\scripts\parity_scan.ps1 -TableFilter "athletes"
+
+    [PARITY] Running Alembic compare...
+
+    [PARITY] PASS (no structural diffs)
+
+    Report: docs/_generated/parity_report.json
+
+    ExitCode: 0'
+  - "PS> .\\scripts\\parity_scan.ps1 -TableFilter \"teams\"\n[PARITY] FAIL (exit=2)\n\
+    Structural diffs detected:\n  - modify_type(teams, 'season_id', String → Integer)\n\
+    \  - modify_nullable(teams, 'name', nullable=True → False)\nReport: docs/_generated/parity_report.json\n\
+    ExitCode: 2"
+  - 'docker-compose up -d postgres
+
+    docker-compose up -d            # Inicia todos os serviços
+
+    docker-compose down             # Para todos os containers'
+  - 'PS C:\HB TRACK> docker-compose up -d postgres
+
+    Creating network "hbtrack_default" with the default driver
+
+    Creating hbtrack_postgres_1 ... done
+
+    ExitCode: 0
+
+
+    PS> docker ps
+
+    CONTAINER ID   IMAGE         STATUS         PORTS
+
+    abc123def456   postgres:14   Up 10 seconds  0.0.0.0:5432->5432/tcp'
+  - 'docker-compose down
+
+    docker-compose down -v    # ❌ PERIGOSO: remove volumes (dados perdidos)'
+  - 'PS> docker-compose down
+
+    Stopping hbtrack_postgres_1 ... done
+
+    Removing hbtrack_postgres_1 ... done
+
+    Removing network hbtrack_default
+
+    ExitCode: 0'
+  - '.\venv\Scripts\python.exe -m alembic upgrade head
+
+    .\venv\Scripts\python.exe -m alembic upgrade +1     # Aplica apenas próxima migration
+
+    .\venv\Scripts\python.exe -m alembic downgrade -1   # Reverte última migration'
+  - 'PS> .\venv\Scripts\python.exe -m alembic upgrade head
+
+    INFO  [alembic.runtime.migration] Running upgrade 12ab34c -> 56cd78e, add training_sessions
+    table
+
+    INFO  [alembic.runtime.migration] Running upgrade 56cd78e -> 90ef12a, add check
+    constraint duration
+
+    ExitCode: 0
+
+
+    PS> .\venv\Scripts\python.exe -m alembic current
+
+    90ef12a (head)'
+  - '.\venv\Scripts\python.exe -m alembic current
+
+    .\venv\Scripts\python.exe -m alembic current --verbose  # Com detalhes'
+  - 'PS> .\venv\Scripts\python.exe -m alembic current
+
+    90ef12a (head)'
+  - 'git reset --hard <commit>      # ❌ Perde trabalho local permanentemente
+
+    git reset --soft <commit>      # ❌ Pode causar confusão de estado
+
+    git clean -f                   # ❌ Remove untracked files (sem recovery)
+
+    git clean -fd                  # ❌ Remove untracked files + diretórios
+
+    git push --force               # ❌ Reescreve histórico remoto (quebra colaboração)
+
+    git push --force-with-lease    # ❌ Menos perigoso mas ainda reescreve histórico
+
+    git branch -D <branch>         # ❌ Deleta branch sem merge check
+
+    git checkout .                 # ❌ Descarta mudanças (usar git restore)'
+  - 'Invoke-Expression <string>           # ❌ Risco de injeção de código
+
+    iex <string>                          # ❌ Alias de Invoke-Expression
+
+    Remove-Item -Recurse -Force <path>   # ❌ Deleta diretórios sem confirmação
+
+    rm -rf <path>                         # ❌ Alias Unix-like de Remove-Item
+
+    Start-Process -NoNewWindow           # ❌ Pode travar terminal
+
+    & <untrusted-script>                 # ❌ Executar scripts não revisados'
+  - '# PowerShell
+
+    Remove-Item .hb_guard\baseline.json -Force    # ❌ Sem backup de baseline
+
+    Remove-Item alembic\versions\* -Recurse       # ❌ Deleta migrations
+
+    Remove-Item .git -Recurse -Force              # ❌ Destrói repo
+
+
+    # Bash (se usado)
+
+    rm -rf .git                                   # ❌ Destrói repo
+
+    rm -rf node_modules                           # ❌ Melhor usar npm/yarn clean
+
+    find . -name "*.pyc" -delete                  # ❌ Usar py clean ou .gitignore'
+  - <exemplo completo>
+  - "# ✅ CORRETO: hashtable splatting\n$params = @{\n    Table = \"athletes\"\n  \
+    \  Profile = \"strict\"\n    AllowCycleWarning = $true\n}\n& .\\scripts\\models_autogen_gate.ps1\
+    \ @params\n\n# ❌ ERRADO: array splatting (falha em PS 5.1)\n$args = @(\"-Table\"\
+    , \"athletes\", \"-Profile\", \"strict\", \"-AllowCycleWarning\")\n& .\\scripts\\\
+    models_autogen_gate.ps1 @args\n# Erro: Cannot process argument transformation\
+    \ on parameter 'Table'"
+  - '# ✅ CORRETO
+
+    $output = & .\scripts\models_autogen_gate.ps1 -Table "athletes" 2>&1
+
+    $exitCode = $LASTEXITCODE  # Captura imediata
+
+    $output | Tee-Object -FilePath "log.txt" | Out-Null # Pipeline APÓS captura
+
+    Write-Host "Exit code: $exitCode"
+
+
+    # ❌ ERRADO
+
+    & .\scripts\models_autogen_gate.ps1 -Table "athletes" 2>&1 | Tee-Object -FilePath
+    "log.txt"
+
+    $exitCode = $LASTEXITCODE  # Valor incorreto (sempre 0)!'
+  - "function Test-ExpectedCWD {\n    param([string]$ExpectedPath)\n\n    $currentPath\
+    \ = Get-Location\n    if ($currentPath -notmatch [regex]::Escape($ExpectedPath))\
+    \ {\n        Write-Host \"[ERROR] Wrong CWD\" -ForegroundColor Red\n        Write-Host\
+    \ \"Expected: *\\$ExpectedPath\" -ForegroundColor Yellow\n        Write-Host \"\
+    Got: $currentPath\" -ForegroundColor Yellow\n        exit 1\n    }\n    Write-Host\
+    \ \"[OK] CWD validated: $currentPath\" -ForegroundColor Green\n}\n\n# Uso\nTest-ExpectedCWD\
+    \ -ExpectedPath \"Hb Track - Backend\"\n# Prossegue apenas se validação passar"
+  Testes Críticos: []
+source: docs/_canon/08_APPROVED_COMMANDS.md
+version: '1.0'

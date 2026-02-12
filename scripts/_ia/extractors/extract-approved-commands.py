@@ -63,7 +63,7 @@ def main():
     
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, 'w', encoding='utf-8') as f:
-        yaml.dump(commands, f, default_flow_style=False, allow_unicode=True)
+        yaml.safe_dump(commands, f, default_flow_style=False, allow_unicode=True)
     
     print(f"✅ Extracted {len(commands['categories'])} categories to {output_path}")
     sys.exit(0)

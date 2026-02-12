@@ -36,7 +36,7 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
-        yaml.dump(examples, f, default_flow_style=False, allow_unicode=True)
+        yaml.safe_dump(examples, f, default_flow_style=False, allow_unicode=True)
     
     print(f"✅ Generated invocation examples: {output_path}")
     sys.exit(0)

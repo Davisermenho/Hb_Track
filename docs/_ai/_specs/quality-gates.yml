@@ -1,6 +1,6 @@
 version: 1.0.0
 source: /home/runner/work/Hb_Track/Hb_Track/docs/_canon/QUALITY_METRICS.md
-generated_at: '2026-02-12T01:00:29.339715Z'
+generated_at: '2026-02-12T01:02:57.122391Z'
 gates:
   complexity_max: 6
   nesting_max: 3

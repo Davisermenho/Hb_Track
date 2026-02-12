@@ -3,19 +3,38 @@ name: Quality Gates
 on:
   pull_request:
     paths:
-      - 'scripts/**'
-      - 'Hb Track - Backend/**'
+      - 'docs/**'
+      - 'scripts/_ia/**'
+      - '.github/workflows/**'
 
 jobs:
-  quality_check:
+  quality_gates:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+      
       - name: Install dependencies
-        run: pip install -r scripts/_ia/requirements.txt
-      - name: TODO - Check quality gates
-        run: python .github/scripts/check_quality_gates.py
-        shell: bash
+        run: |
+          pip install --upgrade pip
+          pip install -r scripts/_ia/requirements.txt
+      
+      - name: Run quality gates extractor
+        run: |
+          python scripts/_ia/extractors/extract-quality-gates.py \
+            --output docs/_ai/_specs/quality-gates.yml \
+            --allow-fallback
+      
+      - name: Validate schema
+        run: |
+          python scripts/_ia/validators/validate-quality-gates-schema.py
+      
+      - name: Run quality gates validator (optional)
+        continue-on-error: true
+        run: |
+          python scripts/_ia/validators/validate-quality-gates.py

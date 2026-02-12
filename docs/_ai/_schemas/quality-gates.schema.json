@@ -1,29 +1,49 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Quality Gates Specification",
-  "description": "JSON Schema que valida quality-gates.yml. Garante que thresholds e actions são válidos.",
+  "description": "JSON Schema que valida quality-gates.yml. Garante que thresholds e metadata são válidos.",
   "type": "object",
-  "required": ["version", "gates"],
+  "required": ["version", "source", "generated_at", "gates"],
+  "additionalProperties": false,
   "properties": {
     "version": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the quality gates specification"
+    },
+    "source": {
+      "type": "string",
+      "description": "Absolute path to the source file (QUALITY_METRICS.md)"
+    },
+    "generated_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$",
+      "description": "ISO 8601 UTC timestamp of when this file was generated"
     },
     "gates": {
       "type": "object",
+      "required": ["complexity_max", "nesting_max", "function_lines_max", "parameters_max"],
+      "additionalProperties": false,
       "properties": {
-        "loc_max": {
-          "type": "integer",
-          "minimum": 0
-        },
         "complexity_max": {
-          "type": "number",
-          "minimum": 0
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum cyclomatic complexity per function"
         },
-        "coverage_min": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 100
+        "nesting_max": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum nesting depth"
+        },
+        "function_lines_max": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum lines per function"
+        },
+        "parameters_max": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of parameters per function"
         }
       }
     }

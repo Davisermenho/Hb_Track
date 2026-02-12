@@ -1,406 +1,499 @@
-# Tutorial para Desenvolvedores Humanos
+# Tutorial: Fluxo de Desenvolvimento Humano com Artefatos AI
 
-**Versão:** 2.0  
+**Versão:** 3.0  
 **Data:** 2026-02-12  
-**Público:** Desenvolvedores humanos trabalhando com HB Track
+**Público:** Desenvolvedores humanos trabalhando com HB Track  
+**Baseado em:** IMPLEMENTATION_SUMMARY.md
 
 ---
 
-## 📋 Pré-requisitos
+## 1. Pré-requisitos
 
-Antes de começar, certifique-se de que você tem:
+### Dependências Obrigatórias
+- **PowerShell 5.1+** (Windows) ou PowerShell Core 7+
+- **Python 3.9+** com venv configurado
+- **Git 2.30+**
+- **Docker** e **Docker Compose** (para PostgreSQL local)
+- **PyYAML 6.0.1+** (citar `scripts/_ia/requirements.txt`)
+- **Radon** (para análise de complexidade ciclomática)
 
-1. **PowerShell 5.1+** (Windows) ou PowerShell Core 7+
-2. **Python 3.9+** com venv configurado
-3. **Git 2.30+**
-4. **Docker** e **Docker Compose** (para PostgreSQL local)
-5. **Acesso ao repositório:** `https://github.com/Davisermenho/Hb_Track`
-
-**Validação de ambiente:**  
-Arquivo de validação: `IMPLEMENTATION_SUMMARY.md` (linhas 187-196)
-
-```powershell
-# Verificar versões
-pwsh --version          # PowerShell
-python --version        # Python 3.9+
-git --version          # Git
-docker --version       # Docker
-```
-
----
-
-## 🚀 Setup Inicial
-
-### 1. Clone e Configure o Ambiente
+### Setup do Ambiente Python
 
 ```powershell
-# Clone o repositório
-git clone https://github.com/Davisermenho/Hb_Track.git
-cd Hb_Track
-
 # Entre no diretório backend
 cd "Hb Track - Backend"
 
-# Crie e ative o ambiente virtual Python
+# Crie e ative o ambiente virtual
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 
-# Instale dependências
+# Instale dependências do projeto
 pip install -r requirements.txt
-pip install PyYAML>=6.0.1 radon
+
+# Instale dependências dos scripts AI
+pip install -r ..\scripts\_ia\requirements.txt
 ```
 
 **Evidência:** `scripts/_ia/utils/yaml_loader.py` (linha 17) requer PyYAML 6.0.1+
 
-### 2. Inicie o PostgreSQL
+### Validação de CWD (Current Working Directory)
+
+**IMPORTANTE:** Scripts diferentes exigem CWDs diferentes:
+
+| Comando | CWD Esperado |
+|---------|-------------|
+| Scripts em `scripts\_ia\` | **Repo root** (`C:\HB TRACK`) |
+| Scripts backend (models_autogen_gate.ps1, etc) | **Backend root** (`C:\HB TRACK\Hb Track - Backend`) |
+
+**Validação obrigatória:**
 
 ```powershell
-# No diretório raiz do projeto
-cd "C:\HB TRACK"
-docker-compose up -d postgres
-```
+# Para scripts AI (repo root)
+if (-not (Test-Path "scripts\_ia")) {
+    Write-Host "[ERROR] Wrong CWD. Expected: repo root" -ForegroundColor Red
+    exit 1
+}
 
-**Comando aprovado:** `docs/_ai/_context/approved-commands.yml` (linhas 308-326)
-
-### 3. Verifique que o Working Directory está correto
-
-```powershell
-# Sempre valide antes de executar scripts
+# Para scripts backend
 $expectedPath = "Hb Track - Backend"
 $currentPath = Get-Location
 if ($currentPath -notmatch [regex]::Escape($expectedPath)) {
-    Write-Host "[ERROR] Wrong CWD. Expected: *$expectedPath, Got: $currentPath" -ForegroundColor Red
+    Write-Host "[ERROR] Wrong CWD. Expected: *\$expectedPath" -ForegroundColor Red
     exit 1
 }
 ```
 
-**Evidência:** `docs/_ai/_context/approved-commands.yml` (linhas 6-9)
-
 ---
 
-## 🎯 Comandos Canônicos (PowerShell)
+## 2. Comandos Canônicos (PowerShell)
 
-### Categoria 1: Inspeção de Estado (Read-Only)
+### 2.1 Extratores
 
-#### 1.1 Verificar estado do repositório Git
+#### extract-approved-commands.py
 
+**Propósito:** Converte `docs\_canon\08_APPROVED_COMMANDS.md` → `docs\_ai\_context\approved-commands.yml` (whitelist de comandos para validação de scripts)
+
+**Comando:**
 ```powershell
-# Ver arquivos modificados (formato curto)
-git status --porcelain
-
-# Ver diferenças em arquivo específico
-git diff app/models/athletes.py
-
-# Ver histórico recente de commits
-git log --oneline -n 5
-
-# Ver detalhes de um commit específico
-git show 09cdbeb
+# CWD: repo root (C:\HB TRACK)
+python scripts\_ia\extractors\extract-approved-commands.py
 ```
 
-**Evidências:**
-- `docs/_ai/_context/approved-commands.yml` (linhas 29-82)
-- Saída esperada em `approved-commands.yml` (linhas 30-36, 42-46, 52-62, 68-82)
+**Saída:** `docs\_ai\_context\approved-commands.yml`
 
-#### 1.2 Verificar baseline do Agent Guard
-
+**Verificação:**
 ```powershell
-# Verificar se arquivos protegidos foram modificados
-.\venv\Scripts\python.exe scripts\agent_guard.py check baseline
-# Exit code 0: nenhum arquivo protegido modificado
-# Exit code 3: violação detectada (ver troubleshooting)
+Get-Content docs\_ai\_context\approved-commands.yml | Select-String "version"
+# Esperado: version: '1.0'
 ```
-
-**Evidências:**
-- `scripts/_ia/generators/generate-handshake-template.py` output referencia `agent_guard.py`
-- `docs/_ai/_context/approved-commands.yml` (linhas 253-265)
-
----
-
-### Categoria 2: Validação de Invariantes
-
-#### 2.1 Executar gate individual
-
-```powershell
-# Wrapper unificado (RECOMENDADO)
-.\scripts\inv.ps1 gate INV-TRAIN-015
-
-# Ou diretamente
-.\scripts\run_invariant_gate.ps1 INV-TRAIN-015
-```
-
-**Evidências:**
-- `scripts/inv.ps1` (linhas 1-11, 39-60)
-- `scripts/run_invariant_gate.ps1` (linhas 1-23)
 
 **Exit codes:**
-- **0:** PASS (todas as validações ok)
-- **1:** CRASH (erro interno)
-- **2:** PARITY FAIL (divergência estrutural)
-- **3:** GUARD FAIL (arquivo protegido modificado)
-- **4:** REQUIREMENTS FAIL (violação de restrições)
+- **0:** Extração bem-sucedida
+- **1:** Arquivo fonte não encontrado
 
-**Referência completa:** `docs/_ai/_maps/troubleshooting-map.json` (linhas 4-65)
-
-#### 2.2 Executar validação de todos os gates
-
-```powershell
-# Executar gate all
-.\scripts\inv.ps1 all
-
-# Dry-run (apenas scan, sem aplicar correções)
-.\scripts\inv.ps1 drift
-```
-
-**Evidência:** `scripts/inv.ps1` (linhas 63-78)
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 46-54), `scripts/_ia/extractors/extract-approved-commands.py`
 
 ---
 
-### Categoria 3: SSOT e Regeneração de Artefatos
+#### extract-troubleshooting.py
 
-#### 3.1 Regenerar artefatos canônicos
+**Propósito:** Converte `docs\_canon\09_TROUBLESHOOTING_GUARD_PARITY.md` → `docs\_ai\_maps\troubleshooting-map.json` (mapa de diagnóstico por exit code)
 
+**Comando:**
 ```powershell
-# Regenera schema.sql, openapi.json, alembic_state.txt, manifest.json
-.\scripts\inv.ps1 refresh
+# CWD: repo root (C:\HB TRACK)
+python scripts\_ia\extractors\extract-troubleshooting.py
 ```
 
-**Evidência:**
-- `scripts/inv.ps1` menciona comando `refresh`
-- `docs/_ai/_context/approved-commands.yml` (linhas 202-233)
+**Saída:** `docs\_ai\_maps\troubleshooting-map.json`
 
-#### 3.2 Extrair comandos aprovados para YAML
-
+**Verificação:**
 ```powershell
-# Converte docs/_canon/08_APPROVED_COMMANDS.md → approved-commands.yml
-.\venv\Scripts\python.exe scripts\_ia\extractors\extract-approved-commands.py
+python scripts\_ia\utils\json_loader.py
+# Smoke test para validar JSON
 ```
-
-**Evidência:** `scripts/_ia/extractors/extract-approved-commands.py` (linhas 1-73)
-
-**Output esperado:**
-```
-✅ Extracted 5 categories to docs/_ai/_context/approved-commands.yml
-ExitCode: 0
-```
-
-**Validação:** `IMPLEMENTATION_SUMMARY.md` (linhas 198-201)
-
-#### 3.3 Extrair troubleshooting map
-
-```powershell
-# Converte docs/_canon/09_TROUBLESHOOTING_GUARD_PARITY.md → troubleshooting-map.json
-.\venv\Scripts\python.exe scripts\_ia\extractors\extract-troubleshooting.py
-```
-
-**Evidência:** `scripts/_ia/extractors/extract-troubleshooting.py` referenciado em `IMPLEMENTATION_SUMMARY.md` (linhas 56-65)
-
-**Output esperado:**
-```
-✅ Extracted troubleshooting for 4 exit codes to docs/_ai/_maps/troubleshooting-map.json
-ExitCode: 0
-```
-
-**Validação:** `IMPLEMENTATION_SUMMARY.md` (linhas 203-205)
-
----
-
-### Categoria 4: Models Pipeline (Autogen/Parity/Requirements)
-
-#### 4.1 Gate individual de model com autogen
-
-```powershell
-# Executar gate com correção automática
-.\scripts\models_autogen_gate.ps1 -Table "athletes" -Profile strict
-
-# Com permissão para warnings de ciclo (FK circular)
-.\scripts\models_autogen_gate.ps1 -Table "athletes" -Profile fk -AllowCycleWarning
-```
-
-**Evidência:** `docs/_ai/_context/approved-commands.yml` (linhas 126-152)
 
 **Exit codes:**
-- **0:** PASS (modelo 100% conforme)
-- **2:** PARITY FAIL (divergência estrutural entre DB e model)
-- **3:** GUARD FAIL (arquivo protegido modificado)
-- **4:** REQUIREMENTS FAIL (violação de tipo, nullable, FK, etc)
+- **0:** Extração bem-sucedida (4 exit codes mapeados)
+- **1:** Arquivo fonte não encontrado
 
-#### 4.2 Parity check (sem autogen)
-
-```powershell
-# Apenas verificar paridade (sem aplicar correções)
-.\scripts\parity_gate.ps1 -Table "athletes"
-
-# Pular regeneração de docs (usar schema.sql existente)
-.\scripts\parity_gate.ps1 -Table "athletes" -SkipDocsRegeneration
-```
-
-**Evidência:** `docs/_ai/_context/approved-commands.yml` (linhas 153-158)
-
-#### 4.3 Validar requirements (sem autogen)
-
-```powershell
-# Validar tipos, nullable, FK, CHECK, INDEX, server_default
-.\venv\Scripts\python.exe scripts\model_requirements.py --table athletes --profile strict
-
-# Perfis disponíveis: strict (rigoroso), fk (apenas FK), lenient (permissivo)
-.\venv\Scripts\python.exe scripts\model_requirements.py --table athletes --profile fk
-```
-
-**Evidência:**
-- `docs/_ai/_context/approved-commands.yml` (linhas 266-291)
-- `docs/_ai/_specs/invocation-examples.yml` (linhas 1-9)
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 56-65), `scripts/_ia/extractors/extract-troubleshooting.py`
 
 ---
 
-### Categoria 5: Batch Operations
+### 2.2 Geradores
 
-#### 5.1 Scan de múltiplas tabelas (dry-run)
+#### generate-handshake-template.py
 
+**Propósito:** Gera template de protocolo ACK/ASK/EXECUTE para agents
+
+**Comando:**
 ```powershell
-# Escanear todos os models sem aplicar correções
-.\scripts\models_batch.ps1 -DryRun -SkipRefresh
+# CWD: repo root (C:\HB TRACK)
+python scripts\_ia\generators\generate-handshake-template.py
 ```
 
-**Evidência:** `docs/_ai/_context/approved-commands.yml` (linhas 159-184)
+**Saída:** `.github\copilot-handshake.md`
 
-**Output esperado:**
-```
-[PHASE 3: Scan - COMPLETE]
-PASS: 10, FAIL: 3, SKIP: 2
-Exit code: 0
-```
-
-#### 5.2 Batch fix (aplicar correções)
-
+**Verificação:**
 ```powershell
-# Executar scan + fix para tabelas com falha
-.\scripts\models_batch.ps1 -SkipRefresh
+Test-Path .github\copilot-handshake.md
+# Esperado: True
 ```
 
-**Evidência:** `docs/_ai/_context/approved-commands.yml` (linhas 185-201)
+**Exit codes:**
+- **0:** Template gerado com sucesso
+
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 95-103), `scripts/_ia/generators/generate-handshake-template.py`
 
 ---
 
-## 🔍 Troubleshooting
+#### generate-invocation-examples.py
 
-### Exit Code 2: Parity Structural Diffs
+**Propósito:** Gera exemplos de invocação para CI/CD a partir de EXEC_TASK files
+
+**Comando:**
+```powershell
+# CWD: repo root (C:\HB TRACK)
+python scripts\_ia\generators\generate-invocation-examples.py
+```
+
+**Saída:** `docs\_ai\_specs\invocation-examples.yml`
+
+**Verificação:**
+```powershell
+Get-Content docs\_ai\_specs\invocation-examples.yml | Select-String "task"
+# Esperado: task: models_validation
+```
+
+**Exit codes:**
+- **0:** Exemplos gerados com sucesso
+
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 105-113), `scripts/_ia/generators/generate-invocation-examples.py`
+
+---
+
+#### generate-checklist-yml.py
+
+**Propósito:** Converte checklist markdown em workflow estruturado YAML
+
+**Comando:**
+```powershell
+# CWD: repo root (C:\HB TRACK)
+python scripts\_ia\generators\generate-checklist-yml.py
+```
+
+**Saída:** `docs\_ai\_specs\checklist-models.yml`
+
+**Verificação:**
+```powershell
+Get-Content docs\_ai\_specs\checklist-models.yml | Select-String "STEP_"
+# Esperado: STEP_0, STEP_1, STEP_2
+```
+
+**Exit codes:**
+- **0:** Checklist YAML gerado com sucesso
+
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 115-123), `scripts/_ia/generators/generate-checklist-yml.py`
+
+---
+
+### 2.3 Validadores
+
+#### validate-approved-commands.py
+
+**Propósito:** Verifica se scripts usam apenas comandos whitelisted
+
+**Comando:**
+```powershell
+# CWD: repo root (C:\HB TRACK)
+python scripts\_ia\validators\validate-approved-commands.py
+```
+
+**Saída:** Exit code 0 (pass) ou 1 (violations)
+
+**Verificação:**
+```powershell
+$LASTEXITCODE
+# 0 = todos os comandos aprovados
+# 1 = comandos não autorizados encontrados
+```
+
+**Exit codes:**
+- **0:** Todos os comandos são aprovados
+- **1:** Comandos não autorizados encontrados (ver output para detalhes)
+
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 71-79), `scripts/_ia/validators/validate-approved-commands.py`
+
+---
+
+#### validate-quality-gates.py
+
+**Propósito:** Enforce complexidade ciclomática (radon cc)
+
+**Comando:**
+```powershell
+# CWD: repo root (C:\HB TRACK)
+python scripts\_ia\validators\validate-quality-gates.py "Hb Track - Backend\app"
+```
+
+**Saída:** Exit code 0 (compliant) ou 1 (violations)
+
+**Verificação:**
+```powershell
+# Output mostra métricas Radon
+# Exemplo: [FAIL] Complexity 12 > 10: app/models/athletes.py
+```
+
+**Exit codes:**
+- **0:** Código está em conformidade com quality gates
+- **1:** Violações de complexidade detectadas
+
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 81-89), `scripts/_ia/validators/validate-quality-gates.py`
+
+---
+
+## 3. Fluxo de Troubleshooting
+
+### Exit Code 0 (Success)
+✅ **Ação:** Prosseguir para próximo passo
+
+---
+
+### Exit Code 1 (Crash)
+
+**Sintomas:**
+- Traceback Python
+- `FileNotFoundError`
+- `ModuleNotFoundError`
+
+**Diagnóstico:**
+```powershell
+# 1. Verificar dependências
+pip list | Select-String "pyyaml|radon"
+
+# 2. Verificar paths
+Get-Location
+# Deve estar em C:\HB TRACK (repo root) ou C:\HB TRACK\Hb Track - Backend
+
+# 3. Verificar versões
+python --version  # Esperado: 3.9+
+pwsh --version
+```
+
+**Soluções:**
+1. Instalar dependências: `pip install -r scripts\_ia\requirements.txt`
+2. Corrigir CWD: `Set-Location "C:\HB TRACK"` ou `cd "Hb Track - Backend"`
+3. Consultar: `docs\references\exit_codes.md`
+
+**Evidência:** `docs\_ai\_maps\troubleshooting-map.json` (exit_codes.1)
+
+---
+
+### Exit Code 2 (Parity)
+
+**Sintomas:**
+- `[PARITY] Structural differences detected`
+- Diff de colunas/constraints/índices
 
 **Causas comuns:**
 - Migration pendente não aplicada
 - Model alterado sem migration correspondente
 - Schema PostgreSQL alterado manualmente (fora de Alembic)
 
-**Referência:** `docs/_ai/_maps/troubleshooting-map.json` (linhas 5-22)
+**Soluções:**
+1. Ver diffs: `Get-Content docs\_generated\parity_report.json`
+2. Aplicar migrations: `.\venv\Scripts\python.exe -m alembic upgrade head`
+3. Consultar: `docs\_canon\09_TROUBLESHOOTING_GUARD_PARITY.md`
 
-**Solução:**
-1. Verificar migrations pendentes: `.\env\Scripts\python.exe -m alembic current`
-2. Aplicar migrations: `.\env\Scripts\python.exe -m alembic upgrade head`
-3. Consultar: `docs/references/exit_codes.md` (seção Exit Code 2)
-
-### Exit Code 3: Guard Violations
-
-**Causas comuns:**
-- Arquivo protegido foi modificado (ex: `app/routes/teams.py`)
-
-**Referência:** `docs/_ai/_maps/troubleshooting-map.json` (linhas 23-36)
-
-**Solução:**
-1. Verificar modificações: `git diff app/routes/teams.py`
-2. Se intencional: atualizar baseline: `.\env\Scripts\python.exe scripts\agent_guard.py snapshot baseline`
-3. Se acidental: reverter: `git restore -- app/routes/teams.py`
-4. Consultar: `docs/_ai/_context/approved-commands.yml` (seção Guard & Baseline)
-
-### Exit Code 4: Requirements Violations
-
-**Causas comuns:**
-- Tipo incompatível (ex: `expected=Integer got=String`)
-- Nullable mismatch (ex: `expected=NOT NULL got=omitted`)
-- Missing server_default (ex: `expected=default_literal:false`)
-
-**Referência:** `docs/_ai/_maps/troubleshooting-map.json` (linhas 37-46)
-
-**Solução:**
-1. Ver violações detalhadas no output do script
-2. Corrigir model manualmente (ex: adicionar `server_default=text("false")`)
-3. Consultar: `docs/references/exit_codes.md` (seção Exit Code 4)
+**Evidência:** `docs\_ai\_maps\troubleshooting-map.json` (exit_codes.2)
 
 ---
 
-## 📚 Documentação Complementar
+### Exit Code 3 (Guard)
+
+**Sintomas:**
+- `[GUARD] Baseline violation detected`
+- Arquivo protegido foi modificado
+
+**Causas comuns:**
+- Modificação intencional em arquivo guardado (ex: `app/routes/teams.py`)
+- Efeito colateral de autogen
+
+**Soluções:**
+```powershell
+# 1. Verificar modificações
+git diff app/routes/teams.py
+
+# 2. Se intencional: atualizar baseline
+.\venv\Scripts\python.exe scripts\agent_guard.py snapshot baseline
+
+# 3. Se acidental: reverter
+git restore -- app/routes/teams.py
+```
+
+**Consultar:** `docs\_canon\09_TROUBLESHOOTING_GUARD_PARITY.md`
+
+**Evidência:** `docs\_ai\_maps\troubleshooting-map.json` (exit_codes.3)
+
+---
+
+### Exit Code 4 (Requirements)
+
+**Sintomas:**
+- `[REQUIREMENTS] Violations detected`
+- Tipo incompatível
+- Nullable mismatch
+- Missing server_default
+
+**Exemplos de violações:**
+```
+expected=Integer got=String
+expected=NOT NULL got=omitted
+expected=default_literal:false got=None
+```
+
+**Soluções:**
+1. Ver violações detalhadas no output do script
+2. Corrigir model manualmente:
+   ```python
+   # Antes
+   is_active: Mapped[bool] = mapped_column(Boolean)
+   
+   # Depois (com server_default)
+   is_active: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+   ```
+3. Consultar: `docs\references\model_requirements_guide.md`
+
+**Evidência:** `docs\_ai\_maps\troubleshooting-map.json` (exit_codes.4)
+
+---
+
+## 4. Workflow Completo: Regenerar Artefatos AI
+
+Execute na ordem exata para manter consistência:
+
+```powershell
+# 0. Garantir CWD correto
+Set-Location "C:\HB TRACK"
+Get-Location  # Verificar
+
+# 1. Gerar comandos aprovados
+python scripts\_ia\extractors\extract-approved-commands.py
+# Verificar: Test-Path docs\_ai\_context\approved-commands.yml
+
+# 2. Gerar troubleshooting map
+python scripts\_ia\extractors\extract-troubleshooting.py
+# Verificar: Test-Path docs\_ai\_maps\troubleshooting-map.json
+
+# 3. Gerar handshake template
+python scripts\_ia\generators\generate-handshake-template.py
+# Verificar: Test-Path .github\copilot-handshake.md
+
+# 4. Gerar invocation examples
+python scripts\_ia\generators\generate-invocation-examples.py
+# Verificar: Test-Path docs\_ai\_specs\invocation-examples.yml
+
+# 5. Gerar checklist YAML
+python scripts\_ia\generators\generate-checklist-yml.py
+# Verificar: Test-Path docs\_ai\_specs\checklist-models.yml
+
+# 6. Validar comandos (CI check)
+python scripts\_ia\validators\validate-approved-commands.py
+# Esperado: Exit 0 (se não houver violations)
+
+# 7. Validar quality gates
+python scripts\_ia\validators\validate-quality-gates.py "Hb Track - Backend\app"
+# Esperado: Exit 0 (se código estiver conforme)
+```
+
+**Exit code propagation:**
+- Se qualquer script retornar exit != 0, PARE e investigue
+- Não prossiga para próximo passo sem resolver o erro atual
+
+---
+
+## 5. Integração com Desenvolvimento
+
+### Antes de Commit
+
+```powershell
+# 1. Garantir que repo está limpo
+git status --porcelain
+# Deve estar vazio OU apenas mudanças intencionais
+
+# 2. Rodar validadores
+python scripts\_ia\validators\validate-approved-commands.py
+python scripts\_ia\validators\validate-quality-gates.py "Hb Track - Backend\app"
+
+# 3. Verificar exit codes (todos devem ser 0)
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "[ERROR] Validations failed. Fix issues before committing." -ForegroundColor Red
+    exit 1
+}
+```
+
+### Após Atualizar Canon
+
+```powershell
+# 1. Regenerar artefatos AI (ver seção 4)
+# ... (comandos da seção 4)
+
+# 2. Commitar artefatos gerados junto com canon atualizado
+git add docs\_ai\_context\approved-commands.yml
+git add docs\_ai\_maps\troubleshooting-map.json
+git add docs\_ai\_specs\*.yml
+git add .github\copilot-handshake.md
+git commit -m "chore: regenerate AI artifacts after canon update"
+```
+
+---
+
+## 6. PENDENTES
+
+### PENDENTE 1: Validar agents autônomos
+
+**Ação:** Listar conteúdo de `scripts\_ia\agents\` e documentar uso
+
+```powershell
+Get-ChildItem "scripts\_ia\agents\" -File
+# TODO: Adicionar documentação conforme implementação
+```
+
+### PENDENTE 2: Confirmar quality-gates.yml
+
+**Ação:** Verificar se arquivo existe
+
+```powershell
+Test-Path docs\_ai\_specs\quality-gates.yml
+# Se False: criar template conforme ADR-016
+```
+
+---
+
+## 7. Documentação Complementar
 
 | Documento | Caminho | Descrição |
 |-----------|---------|-----------|
-| **Start Here** | `docs/_canon/00_START_HERE.md` | Ponto de entrada da documentação canônica |
-| **Approved Commands** | `docs/_canon/08_APPROVED_COMMANDS.md` | Lista completa de comandos aprovados |
-| **Troubleshooting** | `docs/_canon/09_TROUBLESHOOTING_GUARD_PARITY.md` | Guia de resolução de problemas |
-| **Exit Codes** | `docs/references/exit_codes.md` | Referência completa de códigos de saída |
-| **Workflows** | `docs/_canon/03_WORKFLOWS.md` | Fluxos de trabalho detalhados |
-| **Checklist Models** | `docs/execution_tasks/CHECKLIST-CANONICA-MODELS.md` | Checklist para models |
-| **Implementation Summary** | `IMPLEMENTATION_SUMMARY.md` | Resumo da infraestrutura AI |
-
-**Evidências:**
-- Estrutura de `docs/_canon/` obtida via GitHub API
-- Estrutura de `docs/references/` obtida via GitHub API
-- Estrutura de `docs/execution_tasks/` obtida via GitHub API
+| **Start Here** | `docs\_canon\00_START_HERE.md` | Ponto de entrada da documentação canônica |
+| **Approved Commands** | `docs\_canon\08_APPROVED_COMMANDS.md` | Lista completa de comandos aprovados |
+| **Troubleshooting** | `docs\_canon\09_TROUBLESHOOTING_GUARD_PARITY.md` | Guia de resolução de problemas |
+| **Exit Codes** | `docs\references\exit_codes.md` | Referência completa de códigos de saída |
+| **Workflows** | `docs\_canon\03_WORKFLOWS.md` | Fluxos de trabalho detalhados |
+| **Implementation Summary** | `IMPLEMENTATION_SUMMARY.md` | Resumo da infraestrutura AI (9 scripts implementados) |
 
 ---
 
-## 🛠️ Utilitários Python
+## 8. Referências de Evidência
 
-### 1. JSON Loader
-
-```powershell
-# Carregar JSON com validação
-.\venv\Scripts\python.exe -c "from scripts._ia.utils.json_loader import load_json; print(load_json('docs/_ai/_maps/troubleshooting-map.json'))"
-```
-
-**Evidência:** `scripts/_ia/utils/json_loader.py` (linhas 16-43)
-
-### 2. YAML Loader
-
-```powershell
-# Carregar YAML com validação
-.\venv\Scripts\python.exe -c "from scripts._ia.utils.yaml_loader import load_yaml; print(load_yaml('docs/_ai/_context/approved-commands.yml'))"
-```
-
-**Evidência:** `scripts/_ia/utils/yaml_loader.py` (linhas 21-44)
+Todos os comandos e procedures neste documento são baseados em:
+- `IMPLEMENTATION_SUMMARY.md` (linhas 1-256)
+- Código-fonte em `scripts/_ia/**/*.py`
+- Artefatos gerados em `docs/_ai/`
+- Documentação canônica em `docs/_canon/`
 
 ---
 
-## ⚠️ Comandos Proibidos
-
-**NUNCA execute:**
-```powershell
-# ❌ Perde trabalho local permanentemente
-git reset --hard <commit>
-
-# ❌ Remove untracked files (sem recovery)
-git clean -f
-
-# ❌ Reescreve histórico remoto (quebra colaboração)
-git push --force
-
-# ❌ Deleta diretórios sem confirmação
-Remove-Item -Recurse -Force <path>
-
-# ❌ Risco de injeção de código
-Invoke-Expression <string>
-```
-
-**Evidência:** `docs/_ai/_context/approved-commands.yml` (linhas 364-405)
-
----
-
-## 🎓 Próximos Passos
-
-1. **Leia:** `docs/_canon/00_START_HERE.md` para contexto completo
-2. **Pratique:** Execute `.\scripts\inv.ps1 gate INV-TRAIN-015` para validar setup
-3. **Consulte:** `docs/_canon/08_APPROVED_COMMANDS.md` para comandos avançados
-4. **Aprenda:** `docs/_canon/03_WORKFLOWS.md` para fluxos de trabalho completos
-
----
-
-**Última atualização:** 2026-02-12 07:45:52  
-**Autor:** GitHub Copilot  
-**Baseado em:** Artefatos existentes no repositório `Davisermenho/Hb_Track`
+**Última atualização:** 2026-02-12  
+**Autor:** GitHub Copilot Agent  
+**Baseado em:** IMPLEMENTATION_SUMMARY.md e artefatos do repositório `Davisermenho/Hb_Track`

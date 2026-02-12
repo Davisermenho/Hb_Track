@@ -1,0 +1,11 @@
+version: 1.0.0
+source:
+  file: docs/_canon/QUALITY_METRICS.md
+  generated_at: '2026-02-12T01:00:38.795980+00:00'
+gates:
+  complexity_max: 6
+  nesting_max: 3
+  loc_max: 50
+  params_max: 4
+  duplication_max: 3
+  coverage_min: 95

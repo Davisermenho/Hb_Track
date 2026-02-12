@@ -5,17 +5,40 @@ on:
     paths:
       - 'scripts/**'
       - 'Hb Track - Backend/**'
+      - 'docs/_canon/QUALITY_METRICS.md'
+      - 'docs/_ai/_schemas/quality-gates.schema.json'
+      - 'docs/_ai/_specs/quality-gates.yml'
 
 jobs:
-  quality_check:
+  extract_and_validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+      
       - name: Install dependencies
-        run: pip install -r scripts/_ia/requirements.txt
-      - name: TODO - Check quality gates
-        run: python .github/scripts/check_quality_gates.py
+        run: |
+          pip install --upgrade pip
+          pip install -r scripts/_ia/requirements.txt
+      
+      - name: Extract quality gates from QUALITY_METRICS.md
+        run: |
+          python scripts/_ia/extractors/extract-quality-gates.py
         shell: bash
+      
+      - name: Validate quality-gates.yml against schema
+        run: |
+          python scripts/_ia/validators/validate-quality-gates-schema.py
+        shell: bash
+      
+      - name: Run tests for quality gates
+        run: |
+          pip install pytest
+          pytest tests/test_extract_quality_gates.py -v
+        shell: bash
+

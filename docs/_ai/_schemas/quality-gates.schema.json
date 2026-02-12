@@ -3,27 +3,63 @@
   "title": "Quality Gates Specification",
   "description": "JSON Schema que valida quality-gates.yml. Garante que thresholds e actions são válidos.",
   "type": "object",
-  "required": ["version", "gates"],
+  "required": ["version", "source", "gates"],
   "properties": {
     "version": {
       "type": "string",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the quality gates specification"
+    },
+    "source": {
+      "type": "object",
+      "required": ["file", "generated_at"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Source file path (e.g., docs/_canon/QUALITY_METRICS.md)"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the spec was generated"
+        }
+      }
     },
     "gates": {
       "type": "object",
+      "required": ["complexity_max", "nesting_max", "loc_max", "params_max"],
       "properties": {
+        "complexity_max": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum cyclomatic complexity per function"
+        },
+        "nesting_max": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum nesting depth"
+        },
         "loc_max": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "description": "Maximum lines of code per function"
         },
-        "complexity_max": {
-          "type": "number",
-          "minimum": 0
+        "params_max": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Maximum number of parameters per function"
         },
         "coverage_min": {
           "type": "number",
           "minimum": 0,
-          "maximum": 100
+          "maximum": 100,
+          "description": "Minimum code coverage percentage"
+        },
+        "duplication_max": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Maximum code duplication percentage"
         }
       }
     }

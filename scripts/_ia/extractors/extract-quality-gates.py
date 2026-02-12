@@ -111,7 +111,9 @@ def extract_quality_gates(source_path: Path) -> dict:
         gates_spec['gates']['duplication_max'] = int(duplication_match.group(1))
         print(f"[INFO] Extracted duplication_max: {duplication_match.group(1)}")
     
-    # Pattern for coverage: ### 5. Cobertura de Testes ... ≥ 75%
+    # Pattern for coverage: ### 5. Cobertura de Testes
+    # Note: QUALITY_METRICS.md has multiple thresholds (95% critical, 85% business logic, 75% general)
+    # The extractor captures the highest (most stringent) threshold for critical code
     coverage_match = re.search(
         r'###\s*5\.\s*Cobertura de Testes.*?≥\s*(\d+)%',
         content,

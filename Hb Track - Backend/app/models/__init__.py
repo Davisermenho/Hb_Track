@@ -55,6 +55,7 @@ from app.models.match_event import MatchEvent, EventType
 from app.models.wellness_post import WellnessPost
 from app.models.medical_case import MedicalCase
 from app.models.idempotency_key import IdempotencyKey
+from app.models.refresh_token import RefreshToken
 from app.models.email_queue import EmailQueue
 from app.models.competition import Competition
 from app.models.competition_season import CompetitionSeason

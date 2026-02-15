@@ -42,6 +42,9 @@ Se qualquer resposta for NÃO → refinar definição antes de continuar.
 [ ] O executor não precisará inferir contexto externo?
 [ ] O SSOT não está ambíguo ou contraditório?
 [ ] O SSOT é estável (não muda durante a execução)?
+[ ] Test Plan declarado (arquivos + comandos + asserts mínimos)
+
+Sem Test Plan → Determinism Score máximo = 3/5 → proibido emitir TASK BRIEF.
 
 Se houver múltiplas fontes conflitantes → resolver antes de emitir task.
 

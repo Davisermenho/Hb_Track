@@ -1,0 +1,18 @@
+=== SAMPLE-TASK-001 Execution Log ===
+Timestamp: 2026-02-13T12:00:00Z
+Task: Template sample task
+
+COMMANDS EXECUTED:
+1. [12:00:00] mkdir -p artifacts/SAMPLE-TASK-001
+   EXIT_CODE: 0
+   OUTPUT: Directory created successfully
+
+2. [12:00:30] create template files
+   EXIT_CODE: 0
+   OUTPUT: Templates created
+
+FINAL STATUS: PASS
+DURATION: 30 seconds
+ARTIFACTS: 3 files created
+
+=== END LOG ===

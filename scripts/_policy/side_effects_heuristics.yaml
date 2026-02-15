@@ -1,0 +1,208 @@
+# scripts/_policy/side_effects_heuristics.yaml
+#
+# Purpose:
+#   Mechanical heuristics to detect probable side-effects in scripts under /scripts.
+#   This is used by policy checks to FAIL on forbidden patterns for a category.
+#
+# Determinism guarantees:
+#   - Regex-only matching (no ML, no network, no runtime execution)
+#   - Stable evaluation order (extension → ignore → detect → enforce)
+#   - No locale/timezone dependencies
+#   - Case-insensitive regex (explicit (?i) prefix)
+#   - Conservative patterns (high confidence only)
+#
+# Status: ACTIVE (Policy Enforcement Helper)
+# Scope: scripts/**
+# Version: 1.0.0 (aligned with policy_lib.py)
+
+version: 1.0.0
+status: ACTIVE
+scope: "scripts/**"
+
+# Evaluation order MUST be stable:
+# 1) Determine file extension group (.py/.ps1/.sql)
+# 2) Apply global ignores
+# 3) Collect matches by effect buckets
+# 4) Apply category constraints (from scripts.policy.yaml) with these detected effects
+determinism:
+  evaluation_order:
+    - extension_group
+    - global_ignores
+    - detect_effects
+    - enforce_category_rules
+
+global_ignores:
+  # Paths that MUST be ignored by heuristics (non-executable content)
+  path_globs:
+    - "scripts/**/README.md"
+    - "scripts/**/.gitignore"
+    - "scripts/_policy/**"
+    - "scripts/_lib/**"
+    - "scripts/artifacts/**"
+
+# Effects vocabulary (must align with HB_SCRIPT_SIDE_EFFECTS values)
+effects:
+  NONE: []
+  DB_READ: []
+  DB_WRITE: []
+  FS_READ: []
+  FS_WRITE: []
+  ENV_WRITE: []
+  NET: []
+
+# Extensions supported by heuristics
+extension_groups:
+  python:
+    exts: [".py"]
+  powershell:
+    exts: [".ps1"]
+  sql:
+    exts: [".sql"]
+
+# Regex buckets per effect (by language)
+# Notes:
+# - All regex are treated as case-insensitive unless specified.
+# - Keep patterns conservative to avoid false FAILs.
+# - Prefer FAIL on high-confidence patterns only.
+detect:
+  python:
+    DB_WRITE:
+      # SQLAlchemy write patterns (high confidence)
+      - "(?i)\\b(session|db)\\.add\\b"
+      - "(?i)\\b(session|db)\\.add_all\\b"
+      - "(?i)\\b(session|db)\\.commit\\b"
+      - "(?i)\\b(session|db)\\.execute\\b\\s*\\("
+      - "(?i)\\b(engine)\\.execute\\b\\s*\\("
+      # Alembic upgrade/downgrade calls
+      - "(?i)\\balembic\\b.*\\bupgrade\\b"
+      - "(?i)\\balembic\\b.*\\bdowngrade\\b"
+      # NOTE: execute(text("SELECT...")) is handled by PRIORITY RULE in policy_lib.py:
+      #   _is_select_only_execute_text() → confirmed SELECT-only → categorized as DB_READ,
+      #   suppresses this DB_WRITE match to prevent false HB006 in checks/diagnostics.
+
+    DB_READ:
+      # Read-only SQLAlchemy patterns (lower confidence; do not FAIL alone)
+      - "(?i)\\b(session|db)\\.query\\b"
+      - "(?i)\\b(session|db)\\.execute\\b\\s*\\("
+      # NOTE: see DB_WRITE note above for execute() priority handling
+
+    FS_WRITE:
+      # Writes/edits files
+      - "(?i)\\bopen\\(.*?,\\s*['\\\"](w|a|x|wb|ab|xb)['\\\"]"
+      - "(?i)\\bpathlib\\.Path\\(.*?\\)\\.write_text\\b"
+      - "(?i)\\bpathlib\\.Path\\(.*?\\)\\.write_bytes\\b"
+      - "(?i)\\bshutil\\.copy\\b"
+      - "(?i)\\bshutil\\.move\\b"
+      - "(?i)\\bos\\.remove\\b"
+      - "(?i)\\bos\\.unlink\\b"
+      - "(?i)\\bos\\.rmdir\\b"
+      - "(?i)\\bshutil\\.rmtree\\b"
+
+    FS_READ:
+      - "(?i)\\bopen\\(.*?,\\s*['\\\"]r['\\\"]"
+      - "(?i)\\bpathlib\\.Path\\(.*?\\)\\.read_text\\b"
+      - "(?i)\\bpathlib\\.Path\\(.*?\\)\\.read_bytes\\b"
+
+    ENV_WRITE:
+      # System process changes / env mutations
+      - "(?i)\\bos\\.environ\\["
+      - "(?i)\\bos\\.putenv\\b"
+      - "(?i)\\bsubprocess\\.(run|Popen)\\b"
+      - "(?i)\\bos\\.system\\b"
+
+    NET:
+      # Common HTTP clients
+      - "(?i)\\brequests\\.(get|post|put|patch|delete)\\b"
+      - "(?i)\\bhttpx\\.(get|post|put|patch|delete)\\b"
+      - "(?i)\\burllib\\.request\\b"
+      - "(?i)\\bsocket\\b"
+
+  powershell:
+    DB_WRITE:
+      # destructive DB operations / SQL execution (high confidence)
+      - "(?i)\\bDROP\\s+DATABASE\\b"
+      - "(?i)\\bTRUNCATE\\b"
+      - "(?i)\\bDELETE\\s+FROM\\b"
+      - "(?i)\\bUPDATE\\b"
+      - "(?i)\\bINSERT\\s+INTO\\b"
+      - "(?i)\\bpsql\\b.*\\b-f\\b"
+      - "(?i)\\bsqlcmd\\b"
+      - "(?i)\\balembic\\b.*\\bupgrade\\b"
+      - "(?i)\\balembic\\b.*\\bdowngrade\\b"
+
+    DB_READ:
+      - "(?i)\\bSELECT\\b"
+      - "(?i)\\bpsql\\b.*\\b-c\\b"
+
+    FS_WRITE:
+      - "(?i)\\bOut-File\\b"
+      - "(?i)\\bSet-Content\\b"
+      - "(?i)\\bAdd-Content\\b"
+      - "(?i)\\bNew-Item\\b"
+      - "(?i)\\bRemove-Item\\b"
+      - "(?i)\\bCopy-Item\\b"
+      - "(?i)\\bMove-Item\\b"
+
+    FS_READ:
+      - "(?i)\\bGet-Content\\b"
+      - "(?i)\\bTest-Path\\b"
+
+    ENV_WRITE:
+      - "(?i)\\b\\$env:\\w+\\s*="
+      - "(?i)\\bSet-Item\\s+Env:\\b"
+      - "(?i)\\bStart-Service\\b"
+      - "(?i)\\bStop-Service\\b"
+      - "(?i)\\bRestart-Service\\b"
+      - "(?i)\\bStart-Process\\b"
+
+    NET:
+      - "(?i)\\bInvoke-WebRequest\\b"
+      - "(?i)\\bInvoke-RestMethod\\b"
+
+  sql:
+    DB_WRITE:
+      - "(?i)\\bINSERT\\b"
+      - "(?i)\\bUPDATE\\b"
+      - "(?i)\\bDELETE\\b"
+      - "(?i)\\bCREATE\\b"
+      - "(?i)\\bALTER\\b"
+      - "(?i)\\bDROP\\b"
+      - "(?i)\\bTRUNCATE\\b"
+      - "(?i)\\bGRANT\\b"
+      - "(?i)\\bREVOKE\\b"
+      - "(?i)\\bVACUUM\\b"
+      - "(?i)\\bANALYZE\\b"
+    DB_READ:
+      - "(?i)\\bSELECT\\b"
+
+# Category constraints for heuristic FAILs
+# This file only defines "must_not_detect" constraints to avoid duplicating scripts.policy.yaml.
+# The check script SHOULD merge this with scripts.policy.yaml allowed side-effects.
+enforcement:
+  must_not_detect_by_category:
+    checks:
+      - DB_WRITE
+      - FS_WRITE
+      - ENV_WRITE
+      - NET
+    diagnostics:
+      - DB_WRITE
+      - FS_WRITE
+      - ENV_WRITE
+      - NET
+
+  # Optional: soft warnings (do not fail)
+  warn_if_detect_by_category:
+    generate:
+      # generate SHOULD not write DB unless explicitly justified in SSOT,
+      # so we only warn here; main policy may still fail depending on scripts.policy.yaml.
+      - DB_WRITE
+
+# Allowlist exceptions (path-scoped)
+# Use this for rare cases where a safe helper triggers a regex but is actually harmless.
+exceptions:
+  allow_detected_effects:
+    # Example (disabled by default):
+    # - path_glob: "scripts/checks/openapi/check_openapi__*.py"
+    #   allow: [NET]   # if you ever allow fetching schemas from remote (not recommended)
+    []

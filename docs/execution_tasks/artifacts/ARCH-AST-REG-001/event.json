@@ -1,0 +1,16 @@
+{
+  "task_id": "ARCH-AST-REG-001",
+  "timestamp_start": "2026-02-13T12:30:00Z",
+  "timestamp_end": "2026-02-13T12:45:00Z",
+  "status": "PASS",
+  "short_title": "ASTAnalyzer regression tests (async parity lock)",
+  "scope": "Tests",
+  "artifacts": [
+    "docs/scripts/tests/test_ast_analyzer.py",
+    "docs/execution_tasks/artifacts/ARCH-AST-REG-001/pytest_log.txt",
+    "docs/execution_tasks/artifacts/ARCH-AST-REG-001/auditor_log.txt",
+    "docs/execution_tasks/artifacts/ARCH-AST-REG-001/git_state.txt",
+    "docs/execution_tasks/artifacts/ARCH-AST-REG-001/audit_report.yaml"
+  ],
+  "notes_short": "(Audit: Gaps Noted) Audit closed with minor evidence gaps (path/content/index)."
+}

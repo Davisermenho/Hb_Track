@@ -9,7 +9,7 @@
 | Authority | SSOT (Single Source of Truth) |
 | Scope | training/invariants — Catálogo de Invariantes |
 | Last Verified | 2026-02-08 |
-| Depends On | [001-ADR-TRAIN-ssot-precedencia.md](C:/HB TRACK/docs/ADR/001-ADR-TRAIN-ssot-precedencia.md), `schema.sql`, `openapi.json` |
+| Depends On | [001-ADR-TRAIN-ssot-precedencia.md](../../../ADR/001-ADR-TRAIN-ssot-precedencia.md), `schema.sql`, `openapi.json` |
 | Produces | Test cases, migration strategies, enforcement rules |
 
 ---

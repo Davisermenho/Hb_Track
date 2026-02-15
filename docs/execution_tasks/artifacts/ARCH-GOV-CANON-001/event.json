@@ -1,0 +1,12 @@
+{
+  "task_id": "ARCH-GOV-CANON-001",
+  "timestamp_start": "2026-02-13T11:10:00Z",
+  "timestamp_end": "2026-02-13T11:15:00Z",
+  "status": "PASS",
+  "short_title": "Canon docs governance updates",
+  "scope": "Docs",
+  "artifacts": [
+    "docs/_canon/**"
+  ],
+  "notes_short": "Atualização de documentos canônicos para suporte ao modelo de logs."
+}

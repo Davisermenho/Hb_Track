@@ -1,0 +1,403 @@
+# FILE: scripts/generate/docs/gen_scripts_policy_md.py
+# SCRIPT_KIND: GENERATE
+# SIDE_EFFECTS: FS_WRITE
+# SCOPE: docs
+# IDEMPOTENT: YES
+# ENTRYPOINT:
+#   python scripts/generate/docs/gen_scripts_policy_md.py --check
+#   python scripts/generate/docs/gen_scripts_policy_md.py --write
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Tuple
+
+EXIT_PASS = 0
+EXIT_FAIL = 2
+EXIT_ERROR = 3
+
+
+def _eprint(msg: str) -> None:
+    print(msg, file=sys.stderr)
+
+
+def _read_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8")
+
+
+def _write_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def _normalize_newlines(s: str) -> str:
+    s = s.replace("\r\n", "\n").replace("\r", "\n")
+    if not s.endswith("\n"):
+        s += "\n"
+    return s
+
+
+def _load_yaml(path: Path) -> Dict[str, Any]:
+    try:
+        import yaml  # type: ignore
+    except Exception as exc:
+        raise RuntimeError(
+            "Missing dependency: PyYAML. Install with: pip install pyyaml"
+        ) from exc
+    data = yaml.safe_load(_read_text(path))
+    if not isinstance(data, dict):
+        raise ValueError(f"YAML root must be a mapping/object: {path}")
+    return data
+
+
+def _load_json(path: Path) -> Dict[str, Any]:
+    data = json.loads(_read_text(path))
+    if not isinstance(data, dict):
+        raise ValueError(f"JSON root must be an object: {path}")
+    return data
+
+
+def _validate_jsonschema(instance: Dict[str, Any], schema: Dict[str, Any], schema_path: Path) -> None:
+    try:
+        import jsonschema  # type: ignore
+    except Exception as exc:
+        raise RuntimeError(
+            "Missing dependency: jsonschema. Install with: pip install jsonschema"
+        ) from exc
+
+    try:
+        # Draft 2020-12 is declared in schema; use best available validator.
+        validator_cls = jsonschema.validators.validator_for(schema)
+        validator_cls.check_schema(schema)
+        validator = validator_cls(schema)
+        errors = sorted(validator.iter_errors(instance), key=lambda e: e.path)
+    except Exception as exc:
+        raise RuntimeError(f"Schema validation runtime error for: {schema_path}") from exc
+
+    if errors:
+        lines = [f"Policy YAML does not conform to schema ({schema_path}):"]
+        for err in errors[:30]:  # cap
+            loc = "$"
+            for p in err.absolute_path:
+                loc += f"[{p!r}]" if isinstance(p, str) else f"[{p}]"
+            lines.append(f"- {loc}: {err.message}")
+        if len(errors) > 30:
+            lines.append(f"... ({len(errors) - 30} more)")
+        raise ValueError("\n".join(lines))
+
+
+@dataclass(frozen=True)
+class FolderRow:
+    key: str
+    path: str
+    purpose: str
+    gitignored: bool
+    local_gitignore_required: bool
+    allowed: List[str]
+    forbidden: List[str]
+    prefixes: List[str]
+    exts: List[str]
+    subfolders: List[str]
+
+
+def _as_list(x: Any) -> List[Any]:
+    return x if isinstance(x, list) else []
+
+
+def _get_folder_rows(policy: Dict[str, Any]) -> List[FolderRow]:
+    folders = policy.get("folders", {})
+    if not isinstance(folders, dict):
+        raise ValueError("folders must be an object in policy")
+
+    # Deterministic presentation order (stable, human-friendly).
+    presentation_order = [
+        "artifacts",
+        "temp",
+        "run",
+        "checks",
+        "diagnostics",
+        "fixes",
+        "generate",
+        "migrate",
+        "ops",
+        "reset",
+        "seeds",
+    ]
+    keys = [k for k in presentation_order if k in folders] + sorted(
+        [k for k in folders.keys() if k not in presentation_order]
+    )
+
+    rows: List[FolderRow] = []
+    for k in keys:
+        spec = folders[k]
+        if not isinstance(spec, dict):
+            continue
+
+        path = str(spec.get("path", ""))
+        purpose = str(spec.get("purpose", ""))
+        gp = spec.get("git_policy", {}) if isinstance(spec.get("git_policy"), dict) else {}
+        gitignored = bool(gp.get("must_be_gitignored", False))
+        local_gitignore_required = bool(gp.get("local_gitignore_required", False))
+
+        allowed = [str(x) for x in _as_list(spec.get("allowed_side_effects"))]
+        forbidden = [str(x) for x in _as_list(spec.get("forbidden_side_effects"))]
+
+        naming = spec.get("naming", {}) if isinstance(spec.get("naming"), dict) else {}
+        prefixes = [str(x) for x in _as_list(naming.get("required_prefixes"))]
+        exts = [str(x) for x in _as_list(naming.get("allowed_extensions"))]
+
+        # subfolders may be under "subfolders" or special keys
+        subfolders = [str(x) for x in _as_list(spec.get("subfolders"))]
+        # ops has db_subfolders in your SSOT; include deterministically.
+        if k == "ops":
+            db_sub = [str(x) for x in _as_list(spec.get("db_subfolders"))]
+            # represent nested ops/db subfolders
+            for sf in db_sub:
+                subfolders.append(f"db/{sf}")
+
+        subfolders = sorted(set(subfolders))
+
+        rows.append(
+            FolderRow(
+                key=k,
+                path=path,
+                purpose=purpose,
+                gitignored=gitignored,
+                local_gitignore_required=local_gitignore_required,
+                allowed=sorted(set(allowed)),
+                forbidden=sorted(set(forbidden)),
+                prefixes=sorted(set(prefixes)),
+                exts=sorted(set(exts)),
+                subfolders=subfolders,
+            )
+        )
+    return rows
+
+
+def _render_tree(rows: List[FolderRow], scripts_root: str = "scripts") -> str:
+    # Render a deterministic directory “tree” (paths), including subfolders.
+    # We do not list files, only policy folders.
+    out: List[str] = []
+    out.append(f"{scripts_root}/")
+    for r in rows:
+        out.append(f"  {Path(r.path).as_posix()}/")
+        # include declared subfolders for that category
+        base = Path(r.path).as_posix()
+        for sf in r.subfolders:
+            out.append(f"    {base}/{sf}/")
+    return "\n".join(out)
+
+
+def _md_table(headers: List[str], rows: List[List[str]]) -> str:
+    # Deterministic markdown table
+    h = "| " + " | ".join(headers) + " |"
+    sep = "| " + " | ".join(["---"] * len(headers)) + " |"
+    body = ["| " + " | ".join(r) + " |" for r in rows]
+    return "\n".join([h, sep] + body)
+
+
+def _render_markdown(policy: Dict[str, Any], policy_path: Path, schema_path: Path, readme_path: Path) -> str:
+    spec = policy.get("spec", {})
+    if not isinstance(spec, dict):
+        raise ValueError("spec must be an object in policy")
+
+    spec_id = str(spec.get("id", "SPEC-SCRIPTS-UNKNOWN"))
+    title = str(spec.get("title", "HB Track — Scripts Classification (BCP14)"))
+    version = str(spec.get("version", "0.0.0"))
+    status = str(spec.get("status", "DRAFT"))
+    date = str(spec.get("date", ""))
+    scripts_root = str(spec.get("scripts_root", "scripts"))
+
+    precedence = []
+    classification = policy.get("classification", {})
+    if isinstance(classification, dict):
+        precedence = [str(x) for x in _as_list(classification.get("precedence_order"))]
+
+    naming = policy.get("naming", {})
+    patterns = {}
+    if isinstance(naming, dict):
+        patterns = naming.get("patterns", {}) if isinstance(naming.get("patterns"), dict) else {}
+
+    headers = policy.get("headers", {})
+    required_fields = []
+    allowed_kinds = []
+    if isinstance(headers, dict):
+        required_fields = [str(x) for x in _as_list(headers.get("required_fields"))]
+        allowed_kinds = [str(x) for x in _as_list(headers.get("allowed_script_kinds"))]
+
+    rows = _get_folder_rows(policy)
+
+    # Folder policy table
+    folder_table_rows: List[List[str]] = []
+    for r in rows:
+        folder_table_rows.append(
+            [
+                r.key,
+                r.path,
+                "YES" if r.gitignored else "NO",
+                "YES" if r.local_gitignore_required else "NO",
+                ", ".join(r.allowed) if r.allowed else "-",
+                ", ".join(r.forbidden) if r.forbidden else "-",
+                ", ".join(r.prefixes) if r.prefixes else "-",
+                ", ".join(r.exts) if r.exts else "-",
+            ]
+        )
+
+    # Prefix quick table (deterministic)
+    prefix_rows = [[r.key, (", ".join(r.prefixes) if r.prefixes else "-")] for r in rows]
+
+    # Patterns table (deterministic by key)
+    pattern_rows: List[List[str]] = []
+    for k in sorted(patterns.keys()):
+        pattern_rows.append([k, f"`{patterns[k]}`"])
+
+    md: List[str] = []
+    md.append("<!-- GENERATED FILE: DO NOT EDIT -->")
+    md.append(f"<!-- SOURCE-OF-TRUTH: {policy_path.as_posix()} -->")
+    md.append(f"<!-- SCHEMA: {schema_path.as_posix()} -->")
+    md.append("")
+    md.append(f"# {title} — {spec_id}")
+    md.append("")
+    md.append(f"Este documento é **DERIVADO** do SSOT `{policy_path.as_posix()}`. Edição manual aqui cria drift e **MUST NOT** ocorrer.")
+    md.append("")
+    md.append("## Metadados")
+    md.append("")
+    md.append(_md_table(
+        ["Campo", "Valor"],
+        [
+            ["Spec ID", spec_id],
+            ["Versão", version],
+            ["Status", status],
+            ["Data", date],
+            ["SSOT", f"`{policy_path.as_posix()}`"],
+            ["Schema", f"`{schema_path.as_posix()}`"],
+            ["Derivado", f"`{readme_path.as_posix()}`"],
+        ],
+    ))
+    md.append("")
+    md.append("## Árvore oficial de diretórios (policy folders)")
+    md.append("")
+    md.append("```text")
+    md.append(_render_tree(rows, scripts_root=scripts_root))
+    md.append("```")
+    md.append("")
+    md.append("## Ordem determinística de precedência (desempate)")
+    md.append("")
+    if precedence:
+        md.append("```text")
+        md.append(" > ".join(precedence))
+        md.append("```")
+    else:
+        md.append("_PENDING: precedence_order não definido no YAML._")
+    md.append("")
+    md.append("## Tabela determinística de políticas por pasta")
+    md.append("")
+    md.append(_md_table(
+        ["Categoria", "Path", "Gitignored", "Local .gitignore", "Allowed side-effects", "Forbidden side-effects", "Prefixo(s)", "Extensões"],
+        folder_table_rows,
+    ))
+    md.append("")
+    md.append("## Prefixos por categoria")
+    md.append("")
+    md.append(_md_table(["Categoria", "Prefixo(s) obrigatório(s)"], prefix_rows))
+    md.append("")
+    md.append("## Patterns (regex) por categoria")
+    md.append("")
+    md.append(_md_table(["Categoria", "Regex"], pattern_rows if pattern_rows else [["-", "-"]]))
+    md.append("")
+    md.append("## Header obrigatório em todo script")
+    md.append("")
+    md.append("Campos REQUIRED:")
+    md.append("")
+    for f in required_fields:
+        md.append(f"- `{f}`")
+    md.append("")
+    md.append("SCRIPT_KIND permitido:")
+    md.append("")
+    for k in allowed_kinds:
+        md.append(f"- `{k}`")
+    md.append("")
+    md.append("## Drift policy")
+    md.append("")
+    md.append("- O Markdown **MUST** ser gerado a partir do YAML (SSOT).")
+    md.append("- O gate falha se `scripts/README.md` divergir do conteúdo gerado.")
+    md.append("")
+
+    return _normalize_newlines("\n".join(md))
+
+
+def _repo_root_from_this_file() -> Path:
+    # scripts/generate/docs/gen_scripts_policy_md.py -> repo root = parents[3]
+    p = Path(__file__).resolve()
+    try:
+        return p.parents[3]
+    except Exception as exc:
+        raise RuntimeError(f"Cannot infer repo root from path: {p}") from exc
+
+
+def main(argv: List[str]) -> int:
+    ap = argparse.ArgumentParser(description="Validate scripts.policy.yaml, generate scripts/README.md, and gate drift.")
+    ap.add_argument("--check", action="store_true", help="Do not write; fail if README differs.")
+    ap.add_argument("--write", action="store_true", help="Write README; still fail if drift existed before writing.")
+    args = ap.parse_args(argv)
+
+    if args.check and args.write:
+        _eprint("ERROR: use only one of --check or --write")
+        return EXIT_ERROR
+    mode_check = args.check or not args.write  # default is check (safer for CI)
+    mode_write = args.write
+
+    try:
+        repo_root = _repo_root_from_this_file()
+        scripts_root = repo_root / "scripts"
+        policy_path = scripts_root / "scripts.policy.yaml"
+        schema_path = scripts_root / "_policy" / "scripts.policy.schema.json"
+        readme_path = scripts_root / "README.md"
+
+        if not policy_path.exists():
+            _eprint(f"ERROR: missing SSOT policy YAML: {policy_path}")
+            return EXIT_ERROR
+        if not schema_path.exists():
+            _eprint(f"ERROR: missing policy schema: {schema_path}")
+            return EXIT_ERROR
+
+        policy = _load_yaml(policy_path)
+        schema = _load_json(schema_path)
+        _validate_jsonschema(policy, schema, schema_path)
+
+        generated = _render_markdown(policy, policy_path, schema_path, readme_path)
+
+        current = ""
+        if readme_path.exists():
+            current = _normalize_newlines(_read_text(readme_path))
+
+        drift = (current != generated)
+
+        if mode_write:
+            _write_text(readme_path, generated)
+
+        if drift:
+            if mode_check:
+                _eprint("FAIL: scripts/README.md drift detected (generated content differs).")
+                _eprint("Action: run with --write to update README, then re-run --check.")
+                return EXIT_FAIL
+            else:
+                # --write mode: we wrote the fix, but still fail to act as a gate signal.
+                _eprint("FAIL: scripts/README.md was updated (drift fixed), but gate fails because drift existed.")
+                _eprint("Re-run the command to confirm PASS.")
+                return EXIT_FAIL
+
+        print("PASS: scripts/README.md matches generated policy output.")
+        return EXIT_PASS
+
+    except Exception as exc:
+        _eprint(f"ERROR: {exc}")
+        return EXIT_ERROR
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

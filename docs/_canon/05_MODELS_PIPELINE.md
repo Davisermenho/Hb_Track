@@ -6,7 +6,7 @@
 | Status | CANÔNICO |
 | Última verificação | 2026-02-10 (America/Sao_Paulo) |
 | Porta de entrada | docs/_canon/00_START_HERE.md |
-| SSOT estrutural | Hb Track - Backend/docs/_generated/schema.sql |
+| SSOT estrutural | docs/_generated/schema.sql |
 | Objetivo | Garantir 100% de conformidade estrutural Model↔DB (anti-drift / anti-alucinação) |
 
 ## Visão geral
@@ -25,14 +25,31 @@ O autogen pode "arrumar", mas a aprovação final vem de parity + requirements.
 > `[System.IO.File]::WriteAllText()`. Nunca usar `Tee-Object` para gravar o log
 > (causa UTF-16LE no PowerShell 5.1, corrompendo o parser Python).
 
+## Scripts do pipeline (mapa rápido)
+
+**CWD esperado:** `C:\HB TRACK\Hb Track - Backend`
+
+| Componente | Path (relativo ao backend root) | Papel |
+|---|---|---|
+| Orquestrador | `.\scripts\models_autogen_gate.ps1` | Guard → Parity → Autogen → Parity → Requirements (fail-fast) |
+| Batch runner | `.\scripts\models_batch.ps1` | Varre tabelas do SSOT e aplica gate apenas em FAIL |
+| Parity gate | `.\scripts\parity_gate.ps1` | Compara Model↔DB via Alembic compare (structural diffs) |
+| Parity scan | `.\scripts\parity_scan.ps1` | Scan read-only de diffs estruturais (gera relatório) |
+| Guard | `.\venv\Scripts\python.exe scripts\agent_guard.py` | Baseline snapshot/check para impedir drift fora da allowlist |
+| Requirements | `.\venv\Scripts\python.exe scripts\model_requirements.py` | Parser DDL + AST: juiz final SSOT↔Model |
+
 ## SSOT e geração canônica
 
-SSOT estrutural:
-- `Hb Track - Backend/docs/_generated/schema.sql`  
-Gerado por:
+SSOT estrutural (canônico, repo root):
+- `docs/_generated/schema.sql`
+
+Mirror (compatibilidade para execução com CWD=backend root):
+- `Hb Track - Backend/docs/_generated/schema.sql`
+
+Geração canônica (atualiza backend + repo root):
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "C:\HB TRACK\scripts\inv.ps1" refresh
-````
+```
 
 Regra: qualquer validação de estrutura deve usar o SSOT como referência final.
 
@@ -53,6 +70,25 @@ Referência detalhada: `docs/references/exit_codes.md`
 ## Regras operacionais (anti-“tentativa e erro”)
 
 Obrigatórias:
+
+* Checklist pré-voo (fail-fast):
+
+```powershell
+Set-Location "C:\HB TRACK\Hb Track - Backend"
+
+# Ambiente
+Test-Path ".\venv\Scripts\python.exe"            # esperado: True
+$env:DATABASE_URL_SYNC                           # esperado: setado (ou .env presente)
+
+# Guard
+Test-Path ".\.hb_guard\baseline.json"            # esperado: True (ou rodar snapshot)
+
+# SSOT (mirror no backend; repo root deve existir após refresh)
+Test-Path ".\docs\_generated\schema.sql"         # esperado: True
+
+# Repo clean
+git status --porcelain                           # esperado: vazio
+```
 
 * CWD fixo:
 
@@ -86,7 +122,10 @@ Antes de executar qualquer gate, regenere a baseline local para garantir que a c
 
 ```powershell
 Set-Location "C:\HB TRACK\Hb Track - Backend"
-& "venv\Scripts\python.exe" scripts\agent_guard.py snapshot baseline
+& "venv\Scripts\python.exe" scripts\agent_guard.py snapshot `
+  --root "." `
+  --out ".hb_guard/baseline.json" `
+  --exclude "venv,.venv,__pycache__,.pytest_cache,docs\_generated"
 $LASTEXITCODE  # esperado: 0
 ```
 
@@ -94,7 +133,9 @@ $LASTEXITCODE  # esperado: 0
 
 **Validação**: 
 ```powershell
-& "venv\Scripts\python.exe" scripts\agent_guard.py check baseline
+& "venv\Scripts\python.exe" scripts\agent_guard.py check `
+  --root "." `
+  --baseline ".hb_guard/baseline.json"
 $LASTEXITCODE  # esperado: 0
 ```
 
@@ -200,6 +241,23 @@ $LASTEXITCODE
 .\scripts\models_batch.ps1 -ExcludeTables "alembic_version"
 ```
 
+## FAQ (mínimo)
+
+### Quando usar `-Create`?
+
+Use `-Create` em `models_autogen_gate.ps1` quando:
+
+* a tabela existe no DB
+* você está criando o **primeiro** model para ela
+
+Efeito colateral esperado: o gate faz `agent_guard snapshot` (baseline **local**, nunca commitada).
+
+### Diferença entre `-Profile fk`, `strict`, `lenient`
+
+* `strict` (default): validação completa (preferencial).
+* `fk`: perfil para casos com ciclos de FK conhecidos (ex.: `teams`/`seasons`) em conjunto com `-AllowCycleWarning`.
+* `lenient`: perfil relaxado (usar apenas para diagnóstico quando estrito não é viável).
+
 ## Política de baseline (Guard)
 
 Baseline fica em:
@@ -250,14 +308,13 @@ Para uma tabela estar OK:
 * Exit=2 (parity): divergência estrutural real DB↔model (alembic compare).
 * Exit=4 (requirements): model não reflete SSOT (coluna extra/faltante, tipo, nullable, constraints).
 * Exit=1: crash (ambiente, import, bug no script).
-* `parity_report.json` com `table: null`: encoding UTF-16LE no log Alembic (corrigido em P0-A; ver [exit_codes.md](C:/HB TRACK/docs/references/exit_codes.md)).
+* `parity_report.json` com `table: null`: encoding UTF-16LE no log Alembic (corrigido em P0-A; ver `docs/references/exit_codes.md`).
 
 Detalhado em:
 
-* [exit_codes.md](C:/HB TRACK/docs/references/exit_codes.md)
-* [model_requirements_guide.md](C:/HB TRACK/docs/references/model_requirements_guide.md)
-* [CHECKLIST-CANONICA-MODELS.md](C:/HB TRACK/Hb Track - Backend/docs/architecture/CHECKLIST-CANONICA-MODELS.md)
-* [CHANGELOG.md](C:/HB TRACK/docs/execution_tasks/CHANGELOG.md)
-* [EXECUTIONLOG.md](C:/HB TRACK/docs/execution_tasks/EXECUTIONLOG.md)
-
-```
+* `docs/_canon/09_TROUBLESHOOTING_GUARD_PARITY.md`
+* `docs/references/exit_codes.md`
+* `docs/references/model_requirements_guide.md`
+* `docs/execution_tasks/CHECKLIST-CANONICA-MODELS.md`
+* `docs/ADR/architecture/CHANGELOG.md`
+* `docs/execution_tasks/EXECUTIONLOG.md`

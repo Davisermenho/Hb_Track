@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "required": ["task_id", "status"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "status": { "enum": ["PASS", "FAIL", "DRIFT"] },
+    "short_title": { "type": "string" }
+  }
+}

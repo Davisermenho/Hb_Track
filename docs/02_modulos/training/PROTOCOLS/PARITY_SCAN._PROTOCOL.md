@@ -9,7 +9,7 @@
 | Authority | Canon (Canonical Protocol) |
 | Scope | training/parity — Validação de alinhamento model ↔ schema |
 | Last Verified | 2026-02-08 |
-| Depends On | [001-ADR-TRAIN-ssot-precedencia.md](C:/HB TRACK/docs/ADR/001-ADR-TRAIN-ssot-precedencia.md), `schema.sql`, `alembic_state.txt` |
+| Depends On | [001-ADR-TRAIN-ssot-precedencia.md](../../../ADR/001-ADR-TRAIN-ssot-precedencia.md), `schema.sql`, `alembic_state.txt` |
 | Produces | `parity_report.json`, divergence lists, migration recommendations |
 
 ---

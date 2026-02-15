@@ -1,5 +1,10 @@
 # GUARDRAIL_POLICY_BASELINE.md
 
+> **Parent:** [`GUARDRAILS_INDEX.md`](GUARDRAILS_INDEX.md) (Entry point único para todos os guardrails)  
+> **Domain:** Baseline Policy (.hb_guard/baseline.json — LOCAL only)  
+> **Version:** 1.0.0  
+> **Last Updated:** 2026-02-13
+
 ## Descrição
 Guardrail crítico: baseline.json é LOCAL, NUNCA committed. Contém política, evidência, recovery paths.
 

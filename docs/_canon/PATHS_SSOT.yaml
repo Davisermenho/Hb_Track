@@ -1,0 +1,108 @@
+version: "1.0.0"
+status: "CANONICAL"
+last_updated: "2026-02-14"
+scope:
+  - "docs/**"
+  - ".github/**"
+
+roots:
+  canon_docs:
+    path: "docs/_canon"
+    purpose: "Governo canônico, autoridade documental e protocolos"
+  ai_operational_docs:
+    path: "docs/_ai"
+    purpose: "Documentação operacional para agentes"
+  adrs:
+    path: "docs/ADR"
+    purpose: "Architecture Decision Records"
+  execution_tasks:
+    path: "docs/execution_tasks"
+    purpose: "Tarefas executáveis e artefatos de execução"
+  generated:
+    path: "docs/_generated"
+    purpose: "Artefatos gerados (SSOT state artifacts)"
+  docs_scripts:
+    path: "docs/scripts"
+    purpose: "Scripts documentais e validadores de governança"
+  github_instructions:
+    path: ".github/instructions"
+    purpose: "Instruções operacionais para agentes"
+  github_prompts:
+    path: ".github/prompts"
+    purpose: "Prompts operacionais versionados"
+  github_agents:
+    path: ".github/agents"
+    purpose: "Protocolos específicos de agentes"
+  github_workflows:
+    path: ".github/workflows"
+    purpose: "Pipelines e gates de CI/CD"
+
+ssot_files:
+  - "docs/_canon/00_START_HERE.md"
+  - "docs/_canon/AI_KERNEL.md"
+  - "docs/_canon/08_APPROVED_COMMANDS.md"
+  - "docs/_canon/09_TROUBLESHOOTING_GUARD_PARITY.md"
+  - "docs/_canon/SSOT_ROOT_MAP.md"
+  - "docs/_canon/PATHS_SSOT.yaml"
+  - "docs/scripts/validate-ssot-roots.py"
+  - "docs/scripts/_ia/validators/validate-ssot-roots.py"
+
+rules:
+  - id: "instructions_files"
+    description: "Arquivos *.instructions.md pertencem ao root de instruções"
+    include_globs:
+      - ".github/**/*.instructions.md"
+    allowed_roots:
+      - ".github/instructions"
+    require_matches: true
+
+  - id: "prompt_files"
+    description: "Arquivos *.prompt.md pertencem ao root de prompts"
+    include_globs:
+      - ".github/**/*.prompt.md"
+    allowed_roots:
+      - ".github/prompts"
+    require_matches: true
+
+  - id: "arch_request_files"
+    description: "Documentos de execução arquitetural ficam em _arch_requests"
+    include_globs:
+      - "docs/**/AR-*.md"
+      - "docs/**/VALIDATION_MUST_REPORT_*.md"
+      - "docs/**/STATUS_DASHBOARD_*.md"
+      - "docs/**/DUAL_EXECUTION_PLAN_*.md"
+      - "docs/**/SESSION_SUMMARY_*.md"
+    allowed_roots:
+      - "docs/_canon/_arch_requests"
+    require_matches: true
+
+  - id: "exec_task_files"
+    description: "Documentos EXEC_TASK ficam em docs/execution_tasks"
+    include_globs:
+      - "docs/execution_tasks/EXEC_TASK*.md"
+    allowed_roots:
+      - "docs/execution_tasks"
+    require_matches: true
+
+  - id: "adr_files"
+    description: "ADRs ficam em docs/ADR"
+    include_globs:
+      - "docs/**/ADR-*.md"
+      - "docs/**/[0-9][0-9][0-9]-ADR-*.md"
+    allowed_roots:
+      - "docs/ADR"
+    require_matches: true
+
+  - id: "governance_core_scripts"
+    description: "Scripts centrais de governança IA ficam sob docs/scripts/_ia"
+    include_globs:
+      - "docs/scripts/_ia/ai_governance_linter.py"
+      - "docs/scripts/_ia/lint_arch_request.py"
+      - "docs/scripts/_ia/generate_ai_governance_index.py"
+      - "docs/scripts/_ia/check_logs_compaction.py"
+    allowed_roots:
+      - "docs/scripts/_ia"
+    require_matches: true
+
+forbidden_globs:
+  - "scripts/_ia/**/*.py"

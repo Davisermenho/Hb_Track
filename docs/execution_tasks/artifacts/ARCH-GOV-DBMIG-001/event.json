@@ -1,0 +1,13 @@
+{
+  "task_id": "ARCH-GOV-DBMIG-001",
+  "timestamp_start": "2026-02-13T11:10:00Z",
+  "timestamp_end": "2026-02-13T11:15:00Z",
+  "status": "PASS",
+  "short_title": "DB migration state/artifacts",
+  "scope": "Infra",
+  "artifacts": [
+    "alembic_state.txt",
+    "0fb0f76b48a7_add_refresh_tokens.py"
+  ],
+  "notes_short": "Sincronização de estado de migração pendente no workspace."
+}

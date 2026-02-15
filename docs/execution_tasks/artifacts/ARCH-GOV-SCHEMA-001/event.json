@@ -1,0 +1,12 @@
+{
+  "task_id": "ARCH-GOV-SCHEMA-001",
+  "timestamp_start": "2026-02-13T11:10:00Z",
+  "timestamp_end": "2026-02-13T11:15:00Z",
+  "status": "PASS",
+  "short_title": "Schema/API artifacts update",
+  "scope": "Models",
+  "artifacts": [
+    "openapi.json"
+  ],
+  "notes_short": "Atualização de artefatos de contrato (OpenAPI)."
+}

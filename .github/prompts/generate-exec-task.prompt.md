@@ -41,4 +41,4 @@ Exemplos: `"docs/ADR/013-ADR-MODELS.md"` ou um identificador equivalente
 - Lista de arquivos tocados
 - Critérios de aceitação e evidências
 
-**Regra:** Use apenas comandos de [APPROVED_COMMANDS](C:/HB TRACK/docs/_canon/08_APPROVED_COMMANDS.md). Se precisar de novo comando, documente em ADR ou marque como PENDENTE.
+**Regra:** Use apenas comandos de [APPROVED_COMMANDS](../../docs/_canon/08_APPROVED_COMMANDS.md). Se precisar de novo comando, documente em ADR ou marque como PENDENTE.

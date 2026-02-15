@@ -1,0 +1,15 @@
+{
+  "task_id": "ARCH-GOV-STATUS-VOCAB-001",
+  "timestamp_start": "2026-02-13T13:00:00Z",
+  "timestamp_end": "2026-02-13T13:15:00Z",
+  "status": "PASS",
+  "short_title": "Normalizar vocabulário de status (compactador + event.json)",
+  "scope": "Governance",
+  "artifacts": [
+    "docs/execution_tasks/artifacts/ARCH-GOV-STATUS-VOCAB-001/TASK_BRIEF.md",
+    "docs/execution_tasks/artifacts/ARCH-GOV-STATUS-VOCAB-001/audit_report.yaml",
+    "docs/ADR/architecture/GOVERNANCE_DRIFT_LOG.md",
+    "scripts/compact_exec_logs.py"
+  ],
+  "notes_short": "Resgate de indexação para ARCH-AST-001/REG-001 via normalização de status e correção de JSON corrompido."
+}

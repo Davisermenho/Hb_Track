@@ -1,0 +1,7 @@
+{
+  "task_id": "ARCH-DOCS-ARTIFACTS-002",
+  "status": "PASS",
+  "timestamp": "2026-02-13T16:44:01.636872+00:00",
+  "commit_hash": "340c74a",
+  "brief_description": "Padronizar arquivamento de execution_tasks com indices machine-readable"
+}

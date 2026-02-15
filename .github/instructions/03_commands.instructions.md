@@ -10,3 +10,11 @@ REGRAS (OBRIGATÓRIAS):
 4) Sempre prefixar com um “preflight” mínimo (pwd + git root + git status).
 5) Em paths com espaço, sempre usar aspas e/ou caminhos relativos ao repo root.
 6) Proibido: Invoke-Expression/iex, baixar e executar script remoto, Remove-Item destrutivo, git reset --hard, git clean -fd (sem aprovação explícita).
+
+--- 
+
+Regras adicionais (CWD / quoting / segurança):
+- Para comandos operacionais do HB Track, preferir `powershell.exe` e a forma wrapper canônica descrita em `docs/_canon/00_START_HERE.md`.
+- Validar CWD antes de executar (repo root vs backend root, conforme o comando).
+- Proibido usar utilitários POSIX em PowerShell (ex.: `grep/sed/awk/find/xargs`); usar equivalentes PowerShell quando aplicável.
+- Após executar comando externo: capturar `$LASTEXITCODE` imediatamente (não usar pipeline antes da captura).

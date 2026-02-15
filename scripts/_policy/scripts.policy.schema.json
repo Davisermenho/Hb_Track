@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "scripts/_policy/scripts.policy.schema.json",
+  "title": "HB Track Scripts Policy (SSOT) Schema",
+  "description": "SCHEMA FOR OPERATIONAL YAML \u2014 Validates scripts/_policy/scripts.policy.yaml",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "spec",
+    "normative",
+    "taxonomy",
+    "classification",
+    "folders",
+    "naming",
+    "headers",
+    "drift_policy"
+  ],
+  "properties": {
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "version",
+        "status",
+        "date"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "bcp14": {
+          "type": "object"
+        },
+        "repo_root_assumption": {
+          "type": "boolean"
+        },
+        "scripts_root": {
+          "type": "string"
+        },
+        "ssot_files": {
+          "type": "object"
+        },
+        "derived_docs": {
+          "type": "array"
+        }
+      }
+    },
+    "normative": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "exit_codes"
+      ],
+      "properties": {
+        "exit_codes": {
+          "type": "object"
+        }
+      }
+    },
+    "taxonomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "side_effects"
+      ],
+      "properties": {
+        "side_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "precedence_order",
+        "rules"
+      ],
+      "properties": {
+        "precedence_order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "when",
+              "classify_as"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "when": {
+                "type": "object"
+              },
+              "classify_as": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "folders": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifacts": {
+          "type": "object"
+        },
+        "temp": {
+          "type": "object"
+        },
+        "run": {
+          "type": "object"
+        },
+        "checks": {
+          "type": "object"
+        },
+        "diagnostics": {
+          "type": "object"
+        },
+        "fixes": {
+          "type": "object"
+        },
+        "generate": {
+          "type": "object"
+        },
+        "migrate": {
+          "type": "object"
+        },
+        "ops": {
+          "type": "object"
+        },
+        "reset": {
+          "type": "object"
+        },
+        "seeds": {
+          "type": "object"
+        }
+      }
+    },
+    "naming": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "patterns"
+      ],
+      "properties": {
+        "patterns": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "headers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_fields"
+      ],
+      "properties": {
+        "required_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allowed_script_kinds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "examples": {
+          "type": "object"
+        }
+      }
+    },
+    "drift_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "markdown_docs": {
+          "type": "object",
+          "properties": {
+            "must_be_generated_from_yaml": {
+              "type": "boolean"
+            },
+            "must_include_do_not_edit_banner": {
+              "type": "boolean"
+            },
+            "generator_entrypoint": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -91,6 +91,39 @@ git status --porcelain  # esperado: vazio (ou lista de arquivos intencionais)
 
 ---
 
+## Protocolo de Finalização de Tarefa (Obrigatório)
+
+Ao concluir QUALQUER tarefa (Manual ou via EXEC_TASK), o executor DEVE seguir este protocolo para garantir a integridade dos logs e a rastreabilidade via artefatos.
+
+### 1. Registrar Artefatos da Tarefa
+Certifique-se de que todos os relatórios relevantes (parity, requirements, etc.) estejam em `docs/execution_tasks/artifacts/<TASK_ID>/reports/`.
+
+### 2. Gerar Evento de Execução
+Crie ou atualize o arquivo `docs/execution_tasks/artifacts/<TASK_ID>/event.json` com os metadados da execução (status, timestamps, escopo).
+
+### 3. Atualizar Índices (Compacted Logs)
+Execute o script de compactação para atualizar o `CHANGELOG.md` e `EXECUTIONLOG.md`.
+
+```powershell
+# [CMD] Atualizar logs compactados (CWD: C:\HB TRACK)
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "& { Set-Location 'C:\HB TRACK'; & 'C:\HB TRACK\Hb Track - Backend\venv\Scripts\python.exe' 'scripts\compact_exec_logs.py' }"
+```
+
+### 4. Validar Saída e Conformidade
+Execute a auditoria de logs para garantir que não houve "drift" narrativo ou órfãos.
+
+```powershell
+# [CMD] Validar conformidade de logs (CWD: C:\HB TRACK)
+powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "& { Set-Location 'C:\HB TRACK'; & 'C:\HB TRACK\Hb Track - Backend\venv\Scripts\python.exe' 'scripts\_ia\check_logs_compaction.py' --changelog 'docs\ADR\architecture\CHANGELOG.md' --exec-log 'docs\ADR\workflows\EXECUTIONLOG.md' }"
+```
+
+### 5. Validar Estado do Repositório
+- O comando de auditoria deve retornar `[OK] Logs compaction check passed.`.
+- `git status` deve mostrar apenas as mudanças esperadas nos índices e novos artefatos.
+- Uma segunda execução da compactação NÃO deve gerar diffs adicionais (idempotência).
+
+---
+
 # WF-1: Adicionar Invariante de Training
 
 ## Objetivo

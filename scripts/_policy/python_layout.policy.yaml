@@ -1,0 +1,32 @@
+spec:
+  id: "SPEC-LAYOUT-001"
+  title: "HB Track — Python Layout Policy (R12)"
+  version: "1.0.0"
+  status: "APPROVED"
+  date: "2026-02-15"
+normative:
+  exit_codes:
+    pass: 0
+    fail: 2
+    error: 3
+  output_format: "<CODE> | <PATH> | <DETAILS>"
+policy:
+  mode: "report_only"
+  allowed_roots:
+    - "scripts/"
+    - "app/"
+    - "tests/"
+    - "db/"
+    - "docs/scripts/"
+    - ".github/scripts/"
+    - "Hb Track - Backend/app/"
+    - "Hb Track - Backend/tests/"
+    - "Hb Track - Backend/db/"
+    - "Hb Track - Backend/alembic/"
+    - "Hb Track - Backend/scripts/"
+    - "Hb Track - Backend/services/"
+  forbidden_prefixes:
+    - "docs/_generated/"
+    - "Hb Track - Backend/docs/_generated/"
+  ignore_globs:
+    - "backup-dados-criticos/**"

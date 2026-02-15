@@ -61,7 +61,7 @@ def pode_adicionar_atleta(dados_atleta: dict, time: Team) -> bool:
 ```
 
 ### 2. **Simplicidade**
-> *"A solução mais simples que funciona é a melhor solução"*
+> *"A solução mais simples que funciona é a solução mais apropriada"*
 
 - Evitar over-engineering
 - Uma função = uma responsabilidade
@@ -210,7 +210,7 @@ def validar_inscricao_campeonato(
 
 ### 3. Tamanho de Função/Método
 
-**Limite:** ≤ 50 linhas (ideal: 20-30)
+**Limite:** ≤ 50 linhas (recomendado: 20-30)
 
 **Estratégias:**
 - Extrair submétodos

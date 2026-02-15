@@ -26,6 +26,7 @@
 - [Categoria 8: Parity Validation](#categoria-8-parity-validation)
 - [Categoria 9: Database & Infrastructure](#categoria-9-database--infrastructure)
 - [Categoria 10: Alembic Migrations](#categoria-10-alembic-migrations)
+- [Categoria 11: Task Lifecycle & Human Visibility](#categoria-11-task-lifecycle--human-visibility)
 - [Comandos Proibidos (Blacklist)](#comandos-proibidos-blacklist)
 - [Arquivos Protegidos (Guard)](#arquivos-protegidos-guard)
 - [Protocolo de Aprovação Condicional](#protocolo-de-aprovação-condicional)
@@ -215,7 +216,7 @@ git status --porcelain
 - Troubleshooting de guard violations
 
 **Validação (DoD):**
-- Output vazio → repo limpo (ideal para gates)
+- Output vazio → repo limpo (adequado para gates)
 - Output com `M <file>` → arquivo modificado
 - Output com `?? <file>` → arquivo untracked
 
@@ -1068,7 +1069,7 @@ ExitCode: 4
 **Notas:**
 - Requirements é **determinístico**: mesmos inputs → mesmos outputs
 - Não modifica arquivos (read-only)
-- Perfeito para CI (sem side-effects)
+- Adequado para CI (sem side-effects)
 
 ---
 
@@ -1389,6 +1390,250 @@ PS> .\venv\Scripts\python.exe -m alembic current
 
 ---
 
+## Categoria 11: Task Lifecycle & Human Visibility
+
+**Objetivo:** Gerenciar a camada de visibilidade humana e integridade de artefatos de execução.
+
+### Comando: compact_exec_logs.py (Write)
+
+**Ação:** Gera summaries, proofs e atualiza o Status Board e a Home do documento.
+
+**CWD:** Backend root (`C:\HB TRACK\Hb Track - Backend`)
+
+```powershell
+# Gerar/Sincronizar camada de visibilidade (Determinístico)
+.\venv\Scripts\python.exe scripts\compact_exec_logs.py --write
+```
+
+**Parâmetros:**
+- `--write`: Atualiza arquivos físicos se houver drift (HUMAN_SUMMARY, PROOFS, STATUS_BOARD, 00_START_HERE).
+
+**Safe-T Checks:**
+- Verifica se `event.json` existe em cada task.
+- Não atualiza arquivos se o conteúdo gerado for idêntico (idempotência).
+
+**Tempo Estimado:** 5-15s (depende do volume de tasks).
+
+---
+
+### Comando: compact_exec_logs.py (Check)
+
+**Ação:** Valida integridade e sincronia da camada de visibilidade sem alterar arquivos.
+
+**CWD:** Backend root (`C:\HB TRACK\Hb Track - Backend`)
+
+```powershell
+# Validar integridade (Read-Only / Gate-Style)
+.\venv\Scripts\python.exe scripts\compact_exec_logs.py --check
+```
+
+**Exit Codes:**
+- `0`: PASS (Tudo sincronizado)
+- `2`: MISSING (Faltam artefatos ou event.json)
+- `3`: FORMAT (Erro de parsing ou estrutura)
+- `4`: MISMATCH (Drift detectado entre event.json e camada humana ou 00_START_HERE)
+
+**Uso Recomendado:**
+- Usar como gate final antes de commit de tasks.
+
+---
+
+### CMD-11.1: validate-ssot-roots.py
+
+**Objetivo:** Validar que conteúdos/documentos estão no **root canônico por função** (anti-drift de documentação e automação).
+
+**Sintaxe:**
+```powershell
+# Validar política de roots (Read-Only)
+python docs/scripts/validate-ssot-roots.py --config docs/_canon/PATHS_SSOT.yaml
+```
+
+**Parâmetros:**
+- `--config`: Caminho do arquivo canônico de paths/regras (`docs/_canon/PATHS_SSOT.yaml`)
+- `--verbose` (opcional): Mostra roots e contagens por regra
+
+**Exit Codes:**
+- `0`: PASS (conformidade total)
+- `2`: FAIL (violação de root/localização detectada)
+- `1`: Erro de execução/configuração (ex.: PyYAML ausente)
+
+**CWD Esperado:** Repo root (`C:\HB TRACK`)
+
+**Aprovação:** Automática (comando é read-only)
+
+**Quando Usar:**
+- Antes de consolidar/mover docs (garantir que a política está íntegra)
+- Antes de PR (evitar novos arquivos fora do root correto)
+- Após mudanças em `.github/` e `docs/` (enforcement de SSOT roots)
+
+**Validação (DoD):**
+- Exit code = 0
+- Output inclui `[OK] SSOT root validation passed.`
+
+---
+
+### CMD-12.1: pytest
+
+**Objetivo:** Executar testes automatizados com Pytest.
+
+**Sintaxe:**
+```powershell
+# Forma completa (recomendada para agentes)
+C:\HB TRACK\Hb Track - Backend\venv\Scripts\pytest.exe <path> [options]
+
+# Forma curta (se CWD = backend root)
+.\venv\Scripts\pytest <path> [options]
+```
+
+**Parâmetros:**
+- `<path>`: Caminho para diretório/arquivo de testes
+  - `tests/` — todos os testes
+  - `tests/test_example.py` — arquivo específico
+  - `tests/test_example.py::test_func` — teste específico
+- **Flags de controle de execução:**
+  - `--maxfail=<N>` ou `-x`: Para após N falhas (usar `-x` para fail-fast)
+  - `-k <expr>`: Filtra testes pelo nome (ex: `-k "test_athlete"`)
+  - `-m <marker>`: Filtra por marcador (ex: `-m "slow"`)
+  - `--tb=<style>`: Controla traceback (recomendado: `short` ou `line`)
+  - `--disable-warnings`: Suprime warnings de dependências
+  - `-v, --verbose`: Aumenta verbosidade (mostra cada test name)
+  - `-vv`: Verbosidade máxima (mostra asserts detalhados)
+  - `--collect-only`: Lista testes sem executar (útil para validação)
+
+**Exit Codes:**
+- `0`: Todos os testes passaram
+- `1`: Algum teste falhou (assertion error)
+- `2`: Interrupção por erro interno ou `--maxfail` atingido
+- `3`: Test collection failed
+  - Sintaxe inválida em `test_*.py`
+  - Import error (dependência faltando)
+  - Fixtures quebradas em `conftest.py`
+- `4`: Uso interno do pytest (raramente visto)
+- `5`: Nenhum teste foi coletado
+
+**CWD Esperado:** Backend root (`C:\HB TRACK\Hb Track - Backend`)
+
+**Aprovação:** Automática (comando é read-only)
+
+**Quando Usar:**
+- Após gate PASS (validar que testes ainda passam)
+- Antes de commit (garantir que mudanças não quebraram testes)
+- Como gate final (pytest exit=0 → OK para PR)
+- Troubleshooting de regressões (identificar qual teste quebrou)
+
+**Validação (DoD):**
+- Exit code = 0 (todos os testes passaram)
+- Output mostra resumo: `X passed in Y.Zs`
+- Se exit != 0: output mostra quais testes falharam
+
+**Tempo Estimado:** 
+- 1-5min (depende de número de testes e fixtures)
+- Usar `--collect-only` para estimativa rápida (<5s)
+
+**Parâmetros Recomendados para Agentes:**
+```powershell
+# Fail-fast + traceback compacto + sem warnings
+.\venv\Scripts\pytest tests/ -x --tb=short --disable-warnings
+```
+
+**Exemplo (PASS):**
+```powershell
+PS C:\HB TRACK\Hb Track - Backend> .\venv\Scripts\pytest tests/ -x --tb=short
+======================== test session starts =========================
+collected 10 items
+
+tests/test_example.py ..........                              [100%]
+
+======================== 10 passed in 2.34s ==========================
+ExitCode: 0
+```
+
+**Exemplo (FAIL - Assertion Error):**
+```powershell
+PS> .\venv\Scripts\pytest tests/ -x --tb=short
+======================== test session starts =========================
+collected 10 items
+
+tests/test_example.py .........F
+
+========================== FAILURES ==================================
+________________ test_failure_example _______________________________
+tests/test_example.py:42: AssertionError: assert 1 == 2
+===================== short test summary info ========================
+FAILED tests/test_example.py::test_failure_example
+!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+======================== 9 passed, 1 failed in 2.34s =================
+ExitCode: 1
+```
+
+**Exemplo (FAIL - Collection Error):**
+```powershell
+PS> .\venv\Scripts\pytest tests/
+======================== test session starts =========================
+ERROR collecting tests/test_broken.py
+tests/test_broken.py:5: SyntaxError: invalid syntax
+===================== short test summary info ========================
+ERROR tests/test_broken.py
+!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!
+======================== 1 error in 0.12s ============================
+ExitCode: 3
+```
+
+**Troubleshooting:**
+
+| Problema | Causa | Solução |
+|----------|-------|---------|
+| Exit 1 (teste falhou) | Assertion error ou exceção | Revisar traceback com `-vv` |
+| Exit 3 (collection failed) | Sintaxe/import error | Corrigir arquivo com erro |
+| Exit 5 (no tests collected) | Path errado ou padrão `test_*.py` quebrado | Verificar nomenclatura de arquivos |
+| Pytest não encontrado | Venv não ativado ou pytest não instalado | Validar venv com `pip list` |
+| Lentidão (>5min) | Fixtures complexas ou DB queries | Usar `-m "not slow"` para pular testes lentos |
+
+**Validação de Venv (Obrigatória para Agentes):**
+```powershell
+# Validar que venv existe antes de rodar pytest
+$pytestExe = "C:\HB TRACK\Hb Track - Backend\venv\Scripts\pytest.exe"
+if (-not (Test-Path $pytestExe -PathType Leaf)) {
+    Write-Error "Pytest não encontrado. Venv corrompido ou package não instalado."
+    Write-Host "Solução: pip install pytest" -ForegroundColor Yellow
+    exit 1
+}
+```
+
+**Notas:**
+- **NUNCA** rodar pytest fora do venv (contamina ambiente global)
+- Preferir path específico (`tests/test_example.py`) a wildcard (`tests/`)
+- Usar `--collect-only` para diagnóstico sem executar testes
+- Integrar com guard: se pytest exit=0 → baseline válida
+
+---
+
+### Comando: bootstrap_task.py (Scaffolding)
+
+**Ação:** Cria estrutura determinística para uma nova task (event.json, HUMAN_SUMMARY, PROOFS).
+
+**CWD:** Backend root (`C:\HB TRACK\Hb Track - Backend`)
+
+```powershell
+# Criar nova task
+.\venv\Scripts\python.exe scripts\bootstrap_task.py <TASK_ID> --one-liner "<resumo_1_linha>" --scope "<area>"
+```
+
+**Parâmetros:**
+- `<TASK_ID>`: ID da task (Ex: ARCH-XYZ-001).
+- `--one-liner`: Resumo curto da tarefa.
+- `--scope`: Área de atuação (ex: Governance, Docs, Middlewares, etc).
+- `--force`: Sobrescrever se já existir.
+
+**Exit Codes:**
+- `0`: OK
+- `2`: INVALID_ARGS
+- `4`: EXISTS_CONFLICT (uso sem --force)
+
+**Aprovação:** Automática (comando de produtividade).
+
+---
+
 ## Comandos Proibidos (Blacklist)
 
 ### Categoria A: Git Destrutivos
@@ -1648,7 +1893,7 @@ Registrando rationale:
 
 Commit necessário:
 docs/_canon/08_APPROVED_COMMANDS.md
-docs/execution_tasks/CHANGELOG.md
+docs/ADR/architecture/CHANGELOG.md
 
 Criar commit? [Y/N]
 ```

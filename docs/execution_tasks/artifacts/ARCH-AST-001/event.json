@@ -1,0 +1,14 @@
+{
+    "task_id": "ARCH-AST-001",
+    "timestamp_start": "2026-02-13T11:40:00Z",
+    "timestamp_end": "2026-02-13T12:00:00Z",
+    "status": "PASS",
+    "short_title": "Refatoração ASTAnalyzer Async",
+    "scope": "Tests",
+    "artifacts": [
+        "docs/scripts/verify_invariants_tests.py",
+        "docs/execution_tasks/artifacts/ARCH-AST-001/test_inv_train_999_debug.py",
+        "docs/execution_tasks/artifacts/ARCH-AST-001/audit_report.yaml"
+    ],
+    "notes_short": "(Audit: Gaps Noted) Detecção robusta de AsyncFunctionDef, AsyncWith e argumentos keyword-only no validador de invariantes."
+}

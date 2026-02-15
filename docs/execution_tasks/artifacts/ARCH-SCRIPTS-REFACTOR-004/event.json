@@ -1,0 +1,57 @@
+{
+  "event_id": "ARCH-SCRIPTS-REFACTOR-004",
+  "task_id": "ARCH-SCRIPTS-REFACTOR-004",
+  "task_name": "Refactor seed_permissions.py with idempotency and CLI",
+  "status": "PASS",
+  "phase": "6_GOVERNANCE_COMPLETE",
+  "date": "2026-02-13",
+  "script": "Hb Track - Backend/scripts/seed_permissions.py",
+  "determinism_score": "5/5",
+  "gates": [
+    {
+      "gate_id": "GATE-1",
+      "name": "Idempotency validation",
+      "status": "PASS",
+      "evidence": "SMOKE-3: exit 0, [SKIP] message when key exists"
+    },
+    {
+      "gate_id": "GATE-2",
+      "name": "--force bypass",
+      "status": "PASS",
+      "evidence": "SMOKE-4: bypass mechanism validated, skip not triggered"
+    },
+    {
+      "gate_id": "GATE-3",
+      "name": "--dry-run mode",
+      "status": "PASS",
+      "evidence": "SMOKE-5: exit 0, preview shown, no DB modifications"
+    },
+    {
+      "gate_id": "GATE-4",
+      "name": "JSON compliance",
+      "status": "PASS",
+      "evidence": "SMOKE-6: JSON parseable via ConvertFrom-Json"
+    },
+    {
+      "gate_id": "GATE-5",
+      "name": "Documentation",
+      "status": "PASS",
+      "evidence": "SCRIPTS_GUIDE.md updated (sections 7, 8), ARCH_REQUEST + VALIDATION_REPORT created"
+    }
+  ],
+  "smoke_tests": {
+    "total": 6,
+    "passed": 4,
+    "critical_gate_a": "SMOKE-3 idempotency APPROVED"
+  },
+  "classification": "INCORPORAR",
+  "artifacts": [
+    "Hb Track - Backend/scripts/seed_permissions.py",
+    "docs/_canon/_arch_requests/AR-2026-02-17-SCRIPTS-REFACTOR-SEED-PERMISSIONS.md",
+    "docs/_canon/_arch_requests/VALIDATION_MUST_REPORT_AR-2026-02-17.md",
+    "docs/_canon/SCRIPTS_GUIDE.md"
+  ],
+  "commit": "809cb4e",
+  "notes_short": "AR-004 complete: seed_permissions refactored with full idempotency validation (GATE-A APPROVED), CLI standards, JSON logging. 50% P2 milestone achieved (4/8 scripts).",
+  "next_task": "AR-005: seed_default_values.py (AR-2026-02-18)"
+}

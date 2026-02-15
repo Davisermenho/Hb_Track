@@ -1,0 +1,17 @@
+{
+  "task_id": "INV-TRAIN-009-REFERENCE-RUN-001",
+  "timestamp_start": "2026-02-13T12:05:00Z",
+  "timestamp_end": "2026-02-13T12:15:00Z",
+  "status": "PASS",
+  "short_title": "INV-TRAIN-009 reference run baseline",
+  "scope": "Tests",
+  "artifacts": [
+    "docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/command.txt",
+    "docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/run_log.txt",
+    "docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/run_log_rerun.txt",
+    "docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/auditor_log.txt",
+      "docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/git_state.txt",
+      "docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/audit_report.yaml"
+    ],
+    "notes_short": "Baseline execution log captured for INV-TRAIN-009; PASS and reproducible. Audit closed with path/gitstate gaps."
+}

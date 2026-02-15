@@ -1,0 +1,26 @@
+{
+  "event_id": "ARCH-SCRIPTS-REFACTOR-003",
+  "task_id": "ARCH-SCRIPTS-REFACTOR-003",
+  "date": "2026-02-13",
+  "status": "PASS",
+  "category": "Scripts",
+  "title": "Refactor seed_v1_2_initial.py (idempotency + CLI + JSON logging)",
+  "arch_request": "AR-2026-02-16-SCRIPTS-REFACTOR-SEED-V1-2-INITIAL",
+  "commit": "63a92ef",
+  "artifacts": [
+    "docs/_canon/_arch_requests/AR-2026-02-16-SCRIPTS-REFACTOR-SEED-V1-2-INITIAL.md",
+    "docs/_canon/_arch_requests/VALIDATION_MUST_REPORT_AR-2026-02-16.md",
+    "Hb Track - Backend/scripts/seed_v1_2_initial.py",
+    "docs/_canon/SCRIPTS_GUIDE.md"
+  ],
+  "notes_short": "seed_v1_2_initial.py refactored: idempotency via idempotency_keys table, CLI (--dry-run, --force, --help), JSON logging, exit codes (0=noop, 1=seeded, 3=error). Smoke tests: 6/6 PASS. Classification: DIVIDA_TECNICA → INCORPORAR.",
+  "gates": {
+    "GATE-A": "PASS (idempotency validated: 1st run exit 1, 2nd run exit 0)",
+    "GATE-B": "PASS (--force bypass functional, exit 1)",
+    "GATE-C": "PASS (--dry-run no mutations, exit 0)",
+    "GATE-D": "PASS (JSON output parseable)",
+    "GATE-E": "PASS (SCRIPTS_GUIDE.md updated, sec 7 + 8)"
+  },
+  "determinism_score": "5/5",
+  "protocol": "AI_ARCH_EXEC_PROTOCOL v1.0.0"
+}

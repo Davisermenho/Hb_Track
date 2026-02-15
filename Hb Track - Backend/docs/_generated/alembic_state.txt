@@ -1,7 +1,10 @@
 === ALEMBIC HEADS ===
-(no output)
+0fb0f76b48a7 (head)
 
 === ALEMBIC CURRENT ===
-(no output)
+0fb0f76b48a7 (head)
+stderr:
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
 
-Generated: 2026-02-10T10:45:45.590377+00:00Z
+Generated: 2026-02-14T15:01:06.973887+00:00Z

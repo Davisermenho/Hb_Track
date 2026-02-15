@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install -r scripts/_ia/requirements.txt
+        run: pip install -r docs/scripts/_ia/requirements.txt
       - name: TODO - Validate AI docs sync
         run: python .github/scripts/validate_ai_sync.py
         shell: bash

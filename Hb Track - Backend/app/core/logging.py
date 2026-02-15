@@ -14,6 +14,14 @@ import logging
 import json
 from datetime import datetime, timezone
 from typing import Any
+from typing import Dict, Optional
+from uuid import uuid4
+import logging as _logging
+
+from fastapi import Request
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.audit_logs import AuditLog
 
 
 class JSONFormatter(logging.Formatter):
@@ -98,3 +106,50 @@ def setup_logging(env: str, log_level: str) -> None:
     logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
     logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
     logging.getLogger("httpx").setLevel(logging.WARNING)
+
+
+def get_request_id(request: Request) -> str:
+    """Retorna `X-Request-ID` se presente ou gera um UUID v4."""
+    rid = request.headers.get("X-Request-ID")
+    if rid:
+        return rid
+    return str(uuid4())
+
+
+def get_client_ip(request: Request) -> str:
+    """Extrai o IP do cliente do objeto Request, vazio se não disponível."""
+    try:
+        return request.client.host
+    except Exception:
+        return ""
+
+
+def get_user_agent(request: Request) -> str:
+    return request.headers.get("User-Agent", "")[:200]
+
+
+async def emit_auth_audit(db: AsyncSession, action: str, entity: str = "auth", entity_id: Optional[str] = None, actor_id: Optional[str] = None, context: Optional[Dict[str, Any]] = None) -> None:
+    """
+    Insere um registro em `audit_logs` (append-only).
+
+    Usa `AsyncSession` passado pelo handler. Em caso de falha, faz rollback
+    e loga a exceção, mas não propaga (não deve quebrar o fluxo de autenticação).
+    """
+    try:
+        audit = AuditLog(
+            entity=entity,
+            entity_id=entity_id,
+            action=action,
+            actor_id=actor_id,
+            context=context or {},
+            old_value=None,
+            new_value=None,
+        )
+        db.add(audit)
+        await db.commit()
+    except Exception as e:
+        _logging.getLogger(__name__).exception("Failed to emit audit log: %s", e)
+        try:
+            await db.rollback()
+        except Exception:
+            pass

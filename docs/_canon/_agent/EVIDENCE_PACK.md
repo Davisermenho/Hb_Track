@@ -39,10 +39,10 @@ Lista detalhada de comandos executados e seus respectivos Exit Codes.
 
 # 4. ARTIFACTS MODIFIED
 
-Lista de arquivos alterados (com links markdown).
+Lista de arquivos alterados (repo-relative; sem `C:/...`).
 
-*   [Arquivo 1](C:/HB%20TRACK/...)
-*   [Arquivo 2](C:/HB%20TRACK/...)
+*   `docs/...`
+*   `Hb Track - Backend/...`
 
 ---
 

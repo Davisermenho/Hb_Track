@@ -26,7 +26,7 @@ class TestMockUser:
         assert user.user_id == "09cd9e07-3a95-4d1e-8f19-d3d81e1dd8b4"  # superadmin@seed.local
         assert user.organization_id == "85b5a651-6677-4a6a-a08f-60e657a624a2"  # Clube Novo
         assert user.role == "coordenador"
-        assert user.permissions == ["*"]
+        assert user.permissions == {"*": True}
 
     def test_mock_user_custom_values(self):
         """Verifica MockUser com valores customizados."""
@@ -38,7 +38,7 @@ class TestMockUser:
         
         assert user.user_id == "custom-id"
         assert user.role == "treinador"
-        assert user.permissions == ["athlete:read", "athlete:create"]
+        assert user.permissions == {"athlete:read": True, "athlete:create": True}
 
     def test_has_permission_wildcard(self):
         """MockUser com '*' tem todas as permissões."""
@@ -73,6 +73,7 @@ class TestExecutionContext:
         """Verifica criação de ExecutionContext."""
         ctx = ExecutionContext(
             user_id=UUID("00000000-0000-0000-0000-000000000001"),
+            email="test@example.com",
             person_id=UUID("00000000-0000-0000-0000-000000000002"),
             membership_id=UUID("00000000-0000-0000-0000-000000000003"),
             organization_id=UUID("00000000-0000-0000-0000-000000000004"),
@@ -91,6 +92,7 @@ class TestExecutionContext:
         """Verifica que apenas superadmin pode ignorar regras (R3)."""
         ctx_normal = ExecutionContext(
             user_id=uuid4(),
+            email="normal@test.com",
             person_id=uuid4(),
             membership_id=uuid4(),
             organization_id=uuid4(),
@@ -102,6 +104,7 @@ class TestExecutionContext:
         
         ctx_super = ExecutionContext(
             user_id=uuid4(),
+            email="super@test.com",
             person_id=uuid4(),
             membership_id=None,
             organization_id=uuid4(),
@@ -118,6 +121,7 @@ class TestExecutionContext:
         """Verifica vínculo ativo (R42)."""
         ctx_with_membership = ExecutionContext(
             user_id=uuid4(),
+            email="member@test.com",
             person_id=uuid4(),
             membership_id=uuid4(),
             organization_id=uuid4(),
@@ -129,6 +133,7 @@ class TestExecutionContext:
         
         ctx_superadmin = ExecutionContext(
             user_id=uuid4(),
+            email="super@test.com",
             person_id=uuid4(),
             membership_id=None,
             organization_id=uuid4(),
@@ -145,6 +150,7 @@ class TestExecutionContext:
         """Verifica conversão para dict de auditoria (R31, R32)."""
         ctx = ExecutionContext(
             user_id=UUID("00000000-0000-0000-0000-000000000001"),
+            email="audit@test.com",
             person_id=UUID("00000000-0000-0000-0000-000000000002"),
             membership_id=UUID("00000000-0000-0000-0000-000000000003"),
             organization_id=UUID("00000000-0000-0000-0000-000000000004"),

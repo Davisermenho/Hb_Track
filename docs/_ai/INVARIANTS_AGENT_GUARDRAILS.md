@@ -1,5 +1,10 @@
 # INVARIANTS — AGENT GUARDRAILS (LOCAL-FIRST)
 
+> **Parent:** [`_guardrails/GUARDRAILS_INDEX.md`](_guardrails/GUARDRAILS_INDEX.md) (Entry point único para todos os guardrails)  
+> **Domain:** Invariants Guardrails (Training Module — INV-TRAIN-XXX gates)  
+> **Version:** 1.0.0  
+> **Last Updated:** 2026-02-13
+
 Este repositório usa gates para impedir alucinação: nenhuma invariante é considerada instalada/alterada sem evidência do gate.
 
 ## SSOT (Fontes canônicas)

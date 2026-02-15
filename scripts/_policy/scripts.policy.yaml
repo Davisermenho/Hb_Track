@@ -1,0 +1,426 @@
+# FILE: scripts/scripts.policy.yaml
+# SPEC: HB Track — Scripts Classification (BCP14)
+# SSOT: YES (validated by scripts/_policy/scripts.policy.schema.json)
+# NOTE: Markdown docs MUST be generated from this YAML to avoid drift.
+
+spec:
+  id: "SPEC-SCRIPTS-001"
+  title: "HB Track — Scripts Classification (BCP14)"
+  version: "1.0.0"
+  status: "APPROVED"
+  date: "2026-02-14"
+  bcp14:
+    enabled: true
+    references:
+      - "RFC2119"
+      - "RFC8174"
+  repo_root_assumption: true
+  scripts_root: "scripts"
+  ssot_files:
+    policy_yaml: "scripts/scripts.policy.yaml"
+    schema_json: "scripts/_policy/scripts.policy.schema.json"
+  derived_docs:
+    - "scripts/README.md"
+
+normative:
+  exit_codes:
+    checks:
+      pass: 0
+      fail: 2
+      error: 3
+    fixes:
+      pass: 0
+      fail: 2
+      error: 3
+    generate:
+      pass: 0
+      fail: 2
+      error: 3
+    migrate:
+      pass: 0
+      fail: 2
+      error: 3
+    reset:
+      pass: 0
+      fail: 2
+      error: 3
+    seeds:
+      pass: 0
+      fail: 2
+      error: 3
+    ops:
+      pass: 0
+      fail: 2
+      error: 3
+    diagnostics:
+      pass: 0
+      fail: 2
+      error: 3
+
+taxonomy:
+  # SIDE_EFFECTS = operational truth; classification MUST follow these.
+  side_effects:
+    - "NONE"
+    - "DB_READ"
+    - "DB_WRITE"
+    - "FS_READ"
+    - "FS_WRITE"
+    - "NET"
+    - "PROC_START_STOP"
+    - "DESTRUCTIVE"
+
+classification:
+  # Deterministic tie-break order (higher wins).
+  precedence_order:
+    - "reset"
+    - "migrate"
+    - "fixes"
+    - "seeds"
+    - "generate"
+    - "checks"
+    - "diagnostics"
+    - "ops"
+    - "temp"
+    - "artifacts"
+
+  # Deterministic rules: first match wins by precedence_order.
+  rules:
+    - id: "RULE-001-TEMP-PREFIX"
+      when:
+        any:
+          - file_prefix_in: ["tmp_"]
+          - path_contains: ["/temp/"]
+      classify_as: "temp"
+
+    - id: "RULE-002-ARTIFACTS-PATH"
+      when:
+        path_contains: ["/artifacts/"]
+      classify_as: "artifacts"
+
+    - id: "RULE-003-RESET-DESTRUCTIVE"
+      when:
+        any:
+          - side_effects_any_of: ["DESTRUCTIVE", "PROC_START_STOP"]
+          - path_contains: ["/reset/"]
+          - file_prefix_in: ["reset_"]
+      classify_as: "reset"
+
+    - id: "RULE-004-MIGRATE-DBWRITE-EVOLUTIVE"
+      when:
+        any:
+          - path_contains: ["/migrate/"]
+          - file_prefix_in: ["mig_", "migrate_"]
+      classify_as: "migrate"
+
+    - id: "RULE-005-FIXES-WRITE"
+      when:
+        any:
+          - path_contains: ["/fixes/"]
+          - file_prefix_in: ["fix_"]
+          - side_effects_any_of: ["FS_WRITE", "DB_WRITE"]
+      classify_as: "fixes"
+
+    - id: "RULE-006-SEEDS"
+      when:
+        any:
+          - path_contains: ["/seeds/"]
+          - file_prefix_in: ["seed_"]
+      classify_as: "seeds"
+
+    - id: "RULE-007-GENERATE"
+      when:
+        any:
+          - path_contains: ["/generate/"]
+          - file_prefix_in: ["gen_"]
+      classify_as: "generate"
+
+    - id: "RULE-008-CHECKS-READONLY-GATE"
+      when:
+        all:
+          - any:
+              - path_contains: ["/checks/"]
+              - file_prefix_in: ["check_"]
+          - side_effects_only_in: ["NONE", "DB_READ", "FS_READ"]
+      classify_as: "checks"
+
+    - id: "RULE-009-DIAGNOSTICS-READONLY-NONGATE"
+      when:
+        all:
+          - any:
+              - path_contains: ["/diagnostics/"]
+              - file_prefix_in: ["diag_"]
+          - side_effects_only_in: ["NONE", "DB_READ", "FS_READ"]
+      classify_as: "diagnostics"
+
+    - id: "RULE-010-OPS-MAINTENANCE"
+      when:
+        any:
+          - path_contains: ["/ops/"]
+          - file_prefix_in: ["ops_"]
+      classify_as: "ops"
+
+folders:
+  # Root folder policies. Subfolders inherit unless overridden.
+  artifacts:
+    path: "scripts/artifacts"
+    purpose: "Output-only artifacts (logs, reports, diffs). Never SSOT."
+    git_policy:
+      must_be_gitignored: true
+      local_gitignore_required: true
+      allow_tracked:
+        - ".gitignore"
+        - "README.md"
+    allowed_side_effects: ["FS_WRITE", "FS_READ"]
+    forbidden_side_effects: ["DB_WRITE", "NET", "DESTRUCTIVE", "PROC_START_STOP"]
+    naming:
+      required_prefixes: []
+      allowed_extensions: [".md", ".txt", ".json", ".log", ".csv"]
+    constraints:
+      must_not_be_imported_as_input: true
+
+  temp:
+    path: "scripts/temp"
+    purpose: "Quarantine. Unstable scripts; never CI-required."
+    git_policy:
+      must_be_gitignored: true
+      local_gitignore_required: true
+      allow_tracked:
+        - ".gitignore"
+        - "README.md"
+    allowed_side_effects: ["NONE", "DB_READ", "DB_WRITE", "FS_READ", "FS_WRITE", "NET", "PROC_START_STOP", "DESTRUCTIVE"]
+    forbidden_side_effects: []
+    naming:
+      required_prefixes: ["tmp_"]
+      allowed_extensions: [".py", ".ps1", ".sql", ".sh", ".md", ".txt"]
+    promotion:
+      promote_after_referenced_by: ["scripts/run", "docs", "ci"]
+      promote_after_runs: 3
+      must_rename_on_promotion: true
+
+  run:
+    path: "scripts/run"
+    purpose: "Wrappers/entrypoints ONLY. Calls scripts from other categories."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["FS_READ", "FS_WRITE"]
+    forbidden_side_effects: ["DB_WRITE", "NET", "DESTRUCTIVE", "PROC_START_STOP"]
+    naming:
+      required_prefixes: ["run_"]
+      allowed_extensions: [".ps1", ".sh", ".py", ".md"]
+    constraints:
+      must_not_contain_domain_logic: true
+
+  checks:
+    path: "scripts/checks"
+    purpose: "Deterministic gates. Read-only. Exit code defines PASS/FAIL."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["NONE", "DB_READ", "FS_READ"]
+    forbidden_side_effects: ["DB_WRITE", "FS_WRITE", "NET", "DESTRUCTIVE", "PROC_START_STOP"]
+    naming:
+      required_prefixes: ["check_"]
+      allowed_extensions: [".py", ".ps1", ".sh", ".sql", ".md"]
+    subfolders:
+      - "auth"
+      - "db"
+      - "docs"
+      - "lint"
+      - "models"
+      - "openapi"
+      - "security"
+
+  diagnostics:
+    path: "scripts/diagnostics"
+    purpose: "Human triage. Read-only. Not CI-critical."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["NONE", "DB_READ", "FS_READ"]
+    forbidden_side_effects: ["DB_WRITE", "FS_WRITE", "NET", "DESTRUCTIVE", "PROC_START_STOP"]
+    naming:
+      required_prefixes: ["diag_"]
+      allowed_extensions: [".py", ".ps1", ".sh", ".sql", ".md"]
+    subfolders:
+      - "auth"
+      - "db"
+      - "mail"
+      - "perf"
+      - "routes"
+
+  fixes:
+    path: "scripts/fixes"
+    purpose: "Automated corrections (DB and/or repo). Prefer idempotent."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["DB_READ", "DB_WRITE", "FS_READ", "FS_WRITE"]
+    forbidden_side_effects: ["DESTRUCTIVE", "PROC_START_STOP"]
+    naming:
+      required_prefixes: ["fix_"]
+      allowed_extensions: [".py", ".ps1", ".sh", ".sql", ".md"]
+    subfolders:
+      - "auth"
+      - "db"
+      - "docs"
+      - "models"
+      - "openapi"
+    idempotency:
+      must_declare: true
+      should_be_yes: true
+
+  generate:
+    path: "scripts/generate"
+    purpose: "Deterministic generators for derived artifacts (hashes, schema, docs)."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["FS_READ", "FS_WRITE", "DB_READ"]
+    forbidden_side_effects: ["DB_WRITE", "DESTRUCTIVE", "PROC_START_STOP"]
+    naming:
+      required_prefixes: ["gen_"]
+      allowed_extensions: [".py", ".ps1", ".sh", ".sql", ".md"]
+    subfolders:
+      - "docs"
+      - "hashes"
+      - "indexes"
+      - "openapi"
+      - "schema"
+    outputs:
+      allowed_targets:
+        - "scripts/artifacts"
+        - "docs/_generated"
+
+  migrate:
+    path: "scripts/migrate"
+    purpose: "Evolutive data changes (legacy imports, backfills, one-offs)."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["DB_READ", "DB_WRITE", "FS_READ", "FS_WRITE"]
+    forbidden_side_effects: ["DESTRUCTIVE", "PROC_START_STOP"]
+    naming:
+      required_prefixes: ["mig_", "migrate_"]
+      allowed_extensions: [".py", ".ps1", ".sh", ".sql", ".md"]
+    subfolders:
+      - "backfill"
+      - "legacy"
+      - "oneoff"
+    runbook:
+      should_exist_per_script: true
+
+  ops:
+    path: "scripts/ops"
+    purpose: "Operational maintenance (recurring) for DB/infra/mail. Not evolutive migrations."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["DB_READ", "DB_WRITE", "FS_READ", "FS_WRITE", "PROC_START_STOP"]
+    forbidden_side_effects: ["DESTRUCTIVE"]
+    naming:
+      required_prefixes: ["ops_"]
+      allowed_extensions: [".py", ".ps1", ".sh", ".sql", ".md"]
+    subfolders:
+      - "db"
+      - "infra"
+      - "mail"
+    constraints:
+      must_require_explicit_apply_flag: true
+    db_subfolders:
+      - "maintenance"
+      - "refresh"
+
+  reset:
+    path: "scripts/reset"
+    purpose: "Destructive environment operations (reset DB, restart services)."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["DESTRUCTIVE", "PROC_START_STOP", "FS_READ", "FS_WRITE"]
+    forbidden_side_effects: ["NET"]
+    naming:
+      required_prefixes: ["reset_"]
+      allowed_extensions: [".ps1", ".sh", ".py", ".md"]
+    subfolders:
+      - "db"
+      - "env"
+      - "services"
+    constraints:
+      must_require_force_flag: true
+
+  seeds:
+    path: "scripts/seeds"
+    purpose: "Seed datasets (official/test/dev)."
+    git_policy:
+      must_be_gitignored: false
+      local_gitignore_required: false
+    allowed_side_effects: ["DB_READ", "DB_WRITE", "FS_READ"]
+    forbidden_side_effects: ["FS_WRITE", "DESTRUCTIVE", "PROC_START_STOP", "NET"]
+    naming:
+      required_prefixes: ["seed_"]
+      allowed_extensions: [".py", ".sql", ".md", ".txt"]
+    subfolders:
+      - "_archived"
+      - "dev"
+      - "official"
+      - "test"
+    determinism:
+      should_be_deterministic: true
+      must_label_non_deterministic: true
+
+naming:
+  # Enforced regex per category.
+  patterns:
+    checks: "^check_[a-z0-9]+(_[a-z0-9]+){1,6}\\.(py|ps1|sh|sql)$"
+    diagnostics: "^diag_[a-z0-9]+(_[a-z0-9]+){1,6}\\.(py|ps1|sh|sql)$"
+    fixes: "^fix_[a-z0-9]+(_[a-z0-9]+){1,6}\\.(py|ps1|sh|sql)$"
+    generate: "^gen_[a-z0-9]+(_[a-z0-9]+){1,6}\\.(py|ps1|sh|sql)$"
+    migrate: "^(mig_|migrate_)[a-z0-9]+(_[a-z0-9]+){1,6}\\.(py|ps1|sh|sql)$"
+    ops: "^ops_[a-z0-9]+(_[a-z0-9]+){1,6}\\.(py|ps1|sh|sql)$"
+    reset: "^reset_[a-z0-9]+(_[a-z0-9]+){1,6}\\.(ps1|sh|py)$"
+    seeds: "^seed_[a-z0-9]+(_[a-z0-9]+){1,6}\\.(py|sql)$"
+    run: "^run_[a-z0-9]+(_[a-z0-9]+){0,6}\\.(ps1|sh|py)$"
+    temp: "^tmp_[a-z0-9]+(_[a-z0-9]+){0,6}\\.(py|ps1|sh|sql)$"
+
+headers:
+  # Scripts MUST declare these fields in a top comment block.
+  required_fields:
+    - "SCRIPT_KIND"
+    - "SIDE_EFFECTS"
+    - "SCOPE"
+    - "IDEMPOTENT"
+    - "ENTRYPOINT"
+  allowed_script_kinds:
+    - "CHECK"
+    - "DIAGNOSTIC"
+    - "FIX"
+    - "GENERATE"
+    - "MIGRATE"
+    - "OPS"
+    - "RESET"
+    - "SEED"
+    - "RUN"
+    - "TEMP"
+    - "ARTIFACT"
+
+  examples:
+    python_header: |
+      # SCRIPT_KIND: CHECK
+      # SIDE_EFFECTS: DB_READ
+      # SCOPE: openapi
+      # IDEMPOTENT: YES
+      # ENTRYPOINT: python -m scripts.checks.openapi.check_openapi_contract
+
+    powershell_header: |
+      # SCRIPT_KIND: RESET
+      # SIDE_EFFECTS: DESTRUCTIVE
+      # SCOPE: db
+      # IDEMPOTENT: YES
+      # ENTRYPOINT: powershell -ExecutionPolicy Bypass -File scripts/reset/db/reset_db_e2e.ps1 -Force
+
+drift_policy:
+  markdown_docs:
+    must_be_generated_from_yaml: true
+    must_include_do_not_edit_banner: true
+    generator_entrypoint: "python -m scripts.generate.docs.gen_scripts_policy_md"

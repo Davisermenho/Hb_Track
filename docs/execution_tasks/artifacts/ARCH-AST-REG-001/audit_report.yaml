@@ -1,0 +1,45 @@
+ARCH_AUDIT_RESULT:
+  task_id: "ARCH-AST-REG-001"
+  audit_version: "v1.1.0"
+  final_state: "PASS_WITH_EVIDENCE_GAPS_NOTED"
+  closure:
+    status: "CLOSED"
+    timestamp_end_utc: "2026-02-13T12:45:00Z"
+
+  evidence_review:
+    E1_event_json:
+      status: "PARTIAL"
+      gap:
+        - "Path canônico não explicitado (esperado: docs/execution_tasks/artifacts/ARCH-AST-REG-001/event.json)."
+    E2_test_file:
+      status: "PARTIAL"
+      gap:
+        - "Conteúdo integral do arquivo não foi colado; apenas descrição."
+      expected_path: "docs/scripts/tests/test_ast_analyzer.py"
+    E3_pytest_log:
+      status: "PASS"
+      exit_code: 0
+      result: "3 passed"
+    E4_auditor_log:
+      status: "PASS"
+      exit_code: 0
+      marker: "[OK] Logs compaction check passed."
+    E5_index_snapshot:
+      status: "PARTIAL"
+      gap:
+        - "Primeiras linhas reais de CHANGELOG/EXECUTIONLOG não foram coladas."
+    E6_git_clean:
+      status: "PASS"
+      diff_stat: "EMPTY"
+      status_porcelain: "EMPTY"
+
+  governance_gaps_register:
+    - gap_id: "GAP-ASTREG-PATH-001"
+      description: "event.json fornecido sem path canônico completo."
+      disposition: "NON-BLOCKING"
+    - gap_id: "GAP-ASTREG-TESTFILE-001"
+      description: "test_ast_analyzer.py não foi apresentado integralmente."
+      disposition: "NON-BLOCKING"
+    - gap_id: "GAP-ASTREG-INDEXSNAP-001"
+      description: "snapshots reais dos índices não foram apresentados."
+      disposition: "NON-BLOCKING"

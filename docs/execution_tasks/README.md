@@ -12,6 +12,13 @@ Cada EXEC_TASK é um plano passo-a-passo com pré-requisitos, gates, e critério
 
 ## 🚀 Quick Start
 
+### Para uma Nova Tarefa:
+1. **Scaffold**: `python scripts/bootstrap_task.py TASK-ID --title "Título" --scope Area`
+2. **Executar**: Realize o trabalho técnico.
+3. **Documentar**: Atualize `status` e `notes_short` no `event.json` da tarefa.
+4. **Indexar**: `python scripts/compact_exec_logs.py --write` para atualizar o Board.
+
+### Para Executar uma Tarefa Existente:
 1. **Escolha uma tarefa abaixo**
 2. **Valide pré-requisitos** (seção "Checklist")
 3. **Siga Fases 1-4** (Prep → Execute → Validate → Commit)
@@ -19,7 +26,29 @@ Cada EXEC_TASK é um plano passo-a-passo com pré-requisitos, gates, e critério
 
 ---
 
-## 📋 Available Tasks
+## 📏 Line Endings & Determinism
+
+Para evitar falhas de "drift" no CI (**hv_check**) causadas por diferenças entre Windows (CRLF) e Linux (LF):
+
+1. **Configuração**: O repositório usa `.gitattributes` e `.editorconfig` para forçar **LF** em arquivos Python, JSON e Markdown.
+2. **Correção Automática**: O comando `python scripts/compact_exec_logs.py --write` normaliza as quebras de linha dos artefatos.
+3. **Git Config**: Se persistirem problemas, use `git config core.autocrlf input`.
+
+---
+
+## � Troubleshooting: "hv_check fail" (CI Failure)
+
+Se o gate de **Human Visibility Layer** falhar no GitHub Actions, siga este guia rápido:
+
+1. **Identifique a falha**: `python scripts/compact_exec_logs.py --check` (mostra o drift).
+2. **Sincronize**: `python scripts/compact_exec_logs.py --write` (regenera índices e normaliza sumários).
+3. **Valide**: `python scripts/compact_exec_logs.py --check` (deve retornar Exit 0).
+4. **Revise**: `git diff` para garantir que apenas artefatos de execução/docs foram alterados.
+5. **Commit**: `git add . && git commit -m "chore(docs): fix human visibility layer"`.
+
+---
+
+## �📋 Available Tasks
 
 ### 1. `EXEC_TASK_ADR_MODELS_001.md` — Fix Models ↔ DB Divergências
 

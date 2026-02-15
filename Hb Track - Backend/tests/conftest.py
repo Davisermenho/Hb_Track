@@ -9,7 +9,11 @@ Suporta testes síncronos (Session) e assíncronos (AsyncSession).
 """
 import os
 import sys
+from pathlib import Path
 import asyncio
+
+# Add repo-root scripts to path for test imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
 
 # IMPORTANTE: Setar ENV=test ANTES de qualquer importação da app
 # Isso garante que rate_limit.py use limite alto (10000/min)
@@ -327,3 +331,55 @@ def treinador_team_id(treinador_auth_client, db):
         pytest.skip("Nenhuma equipe ATIVA encontrada para o treinador")
 
     return str(active_items[0]["id"])
+
+
+# ============================================
+# FIXTURES PARA TESTES DE INVARIANTES (AUTH)
+# ============================================
+
+@pytest.fixture(scope="function")
+def auth_headers(superadmin_cookies):
+    """
+    Retorna header de autenticação Bearer (apenas para testes de precedência).
+    Na prática, extrai o token do cookie e formata como Bearer header.
+    """
+    # Extrair token JWT do cookie (assumir formato simples)
+    token = superadmin_cookies.get("hb_access_token") or superadmin_cookies.get("access_token")
+    if not token:
+        pytest.skip("Token não encontrado nos cookies de superadmin")
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest.fixture(scope="function")
+def auth_cookies(superadmin_cookies):
+    """
+    Alias direto para superadmin_cookies (para compatibilidade com nomenclatura de testes).
+    """
+    return superadmin_cookies
+
+
+@pytest.fixture(scope="function")
+def test_season_data():
+    """
+    Payload mínimo para criar uma Season (usado em testes de CSRF).
+    """
+    return {
+        "name": "Test Season 2025",
+        "start_date": "2025-01-01",
+        "end_date": "2025-12-31",
+        "status": "active"
+    }
+
+
+@pytest.fixture(scope="function")
+def test_training_session_data(test_team_id):
+    """
+    Payload mínimo para criar uma TrainingSession (usado em testes de deprecação Bearer).
+    """
+    return {
+        "team_id": test_team_id,
+        "date": "2025-06-15",
+        "duration_minutes": 90,
+        "session_type": "technical",
+        "notes": "Test session for Bearer deprecation invariant"
+    }

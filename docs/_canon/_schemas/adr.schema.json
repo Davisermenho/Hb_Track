@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hbtrack.dev/schemas/adr.schema.json",
+  "title": "ADR Schema",
+  "description": "JSON Schema for HB Track Architecture Decision Records (ADR)",
+  "type": "object",
+  "required": ["title", "status", "date", "context", "decision", "consequences"],
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "ADR title (without 'ADR-NNN' prefix)",
+      "minLength": 5,
+      "maxLength": 200
+    },
+    "adr_number": {
+      "type": "integer",
+      "description": "Sequential ADR number",
+      "minimum": 1
+    },
+    "status": {
+      "type": "string",
+      "description": "Current status of the ADR",
+      "enum": ["PROPOSED", "ACCEPTED", "DEPRECATED", "SUPERSEDED"]
+    },
+    "date": {
+      "type": "string",
+      "description": "Decision date in ISO 8601 format",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "autor": {
+      "type": "string",
+      "description": "Decision author or responsible team"
+    },
+    "fase": {
+      "type": "string",
+      "description": "Project phase when decision was made"
+    },
+    "modules_affected": {
+      "type": "array",
+      "description": "List of modules/components affected by this decision",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "context": {
+      "type": "string",
+      "description": "Problem description and background (why this decision was needed)",
+      "minLength": 20
+    },
+    "decision": {
+      "type": "string",
+      "description": "What was decided (what/how/why) - NO commands or implementation steps",
+      "minLength": 20
+    },
+    "alternatives": {
+      "type": "array",
+      "description": "Alternatives considered but rejected",
+      "items": {
+        "type": "object",
+        "required": ["option", "reasoning"],
+        "properties": {
+          "option": {
+            "type": "string",
+            "description": "Alternative approach description"
+          },
+          "reasoning": {
+            "type": "string",
+            "description": "Why this alternative was rejected"
+          }
+        }
+      }
+    },
+    "consequences": {
+      "type": "object",
+      "description": "Impacts of the decision",
+      "properties": {
+        "positive": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "negative": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "neutral": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "validation": {
+      "type": "object",
+      "description": "Criteria for conformance (NOT execution steps)",
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "evidence": {
+          "type": "array",
+          "description": "Artifacts that prove conformance",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "superseded_by": {
+      "type": "string",
+      "description": "ADR number that supersedes this one (if status=SUPERSEDED)",
+      "pattern": "^ADR-\\d{3}$"
+    },
+    "references": {
+      "type": "array",
+      "description": "Related documents (PRD, ARCH_REQUEST, EXEC_TASK, other ADRs)",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

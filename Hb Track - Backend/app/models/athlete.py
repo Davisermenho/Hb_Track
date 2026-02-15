@@ -47,8 +47,8 @@ from typing import Optional, TYPE_CHECKING
 from uuid import UUID
 
 import sqlalchemy as sa
-from sqlalchemy import ForeignKey, CheckConstraint, Index, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, CheckConstraint, Index, UniqueConstraint, select, ForeignKeyConstraint
+from sqlalchemy.orm import Mapped, mapped_column, column_property, relationship
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB as PG_JSONB, INET as PG_INET, ENUM as PG_ENUM
 # HB-AUTOGEN-IMPORTS:END
 from enum import Enum
@@ -81,7 +81,7 @@ class Athlete(Base):
     __tablename__ = "athletes"
 
 
-# HB-AUTOGEN:BEGIN
+    # HB-AUTOGEN:BEGIN
     # AUTO-GENERATED FROM DB (SSOT). DO NOT EDIT MANUALLY.
     # Table: public.athletes
     __table_args__ = (
@@ -127,7 +127,6 @@ class Athlete(Base):
     deleted_reason: Mapped[Optional[str]] = mapped_column(sa.Text(), nullable=True)
     organization_id: Mapped[Optional[UUID]] = mapped_column(PG_UUID(as_uuid=True), ForeignKey('organizations.id', name='fk_athletes_organization_id', ondelete='RESTRICT'), nullable=True)
     # HB-AUTOGEN:END
-
     # ==================== RELATIONSHIPS ====================
     team_registrations: Mapped[list["TeamRegistration"]] = relationship(
         "TeamRegistration",

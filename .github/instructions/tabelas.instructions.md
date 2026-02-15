@@ -159,7 +159,7 @@ Execute SEMPRE após um gate que retornou 0:
 No backend root:
 - `git restore -- "docs/_generated/alembic_state.txt" "docs/_generated/manifest.json" "docs/_generated/parity_report.json" "docs/_generated/schema.sql"`
 No repo root (um nível acima):
-- `git restore -- "C:/HB TRACK/Hb Track - Backend/docs/_generated/alembic_state.txt" "C:/HB TRACK/Hb Track - Backend/docs/_generated/manifest.json" "C:/HB TRACK/Hb Track - Backend/docs/_generated/schema.sql" "C:/HB TRACK/Hb Track - Backend/docs/_generated/trd_training_permissions_report.txt"`
+- `git restore -- "..\docs\_generated\alembic_state.txt" "..\docs\_generated\manifest.json" "..\docs\_generated\schema.sql" "..\docs\_generated\trd_training_permissions_report.txt"`
 
 Se algum restore falhar: PARE e reporte.
 

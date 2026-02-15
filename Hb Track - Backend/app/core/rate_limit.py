@@ -30,7 +30,7 @@ TEST_RATE_LIMIT = "10000/minute"
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=[TEST_RATE_LIMIT if IS_TEST_ENV else "200/minute"],
-    storage_uri="memory://",  # In-memory storage (para produção, usar Redis)
+    storage_uri=os.getenv("REDIS_URL", "memory://"),  # Configurável via REDIS_URL, fallback in-memory
 )
 
 

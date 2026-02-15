@@ -1,0 +1,14 @@
+{
+  "task_id": "ARCH-GOV-AUDIT-LOGS-001",
+  "timestamp_start": "2026-02-13T11:25:00Z",
+  "timestamp_end": "2026-02-13T11:32:00Z",
+  "status": "PASS",
+  "short_title": "Automated log compliance auditor (scripts/_ia)",
+  "scope": "Governance",
+  "artifacts": [
+    "docs/scripts/_ia/check_logs_compaction.py",
+    "docs/_canon/03_WORKFLOWS.md",
+    "scripts/compact_exec_logs.py"
+  ],
+  "notes_short": "Implementação de gate automático (Exit 2) para detectar bloat narrativo e tarefas órfãs nos logs."
+}

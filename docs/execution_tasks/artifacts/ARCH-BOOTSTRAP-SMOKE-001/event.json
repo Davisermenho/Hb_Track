@@ -1,0 +1,12 @@
+{
+  "artifacts": [],
+  "notes_short": "Smoke bootstrap",
+  "scope": "Governance",
+  "short_title": "Smoke bootstrap",
+  "status": "DRAFT",
+  "task_id": "ARCH-BOOTSTRAP-SMOKE-001",
+  "timestamp_end": "2026-02-13T19:49:18Z",
+  "timestamp_start": "2026-02-13T19:49:18Z",
+  "type": "EXEC_TASK",
+  "version_intent": "0.1.0"
+}

@@ -19,6 +19,7 @@ from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
 from app.core.rate_limit import limiter, rate_limit_exceeded_handler
+from app.middleware.csrf import CSRFMiddleware
 from app.core.exceptions import NotFoundError, ForbiddenError, ValidationError, ConflictError
 from app.api.v1 import api_router
 from app.schemas.error import ErrorCode
@@ -78,6 +79,10 @@ app.add_middleware(
 
 # Request ID (depois de Security Headers)
 app.add_middleware(RequestIDMiddleware)
+
+# CSRF Protection (depois de Request ID, antes de rate limiting)
+# Valida X-CSRF-Token para métodos unsafe (POST/PUT/PATCH/DELETE) com Cookie auth
+app.add_middleware(CSRFMiddleware)
 
 # Rate limiting
 app.state.limiter = limiter

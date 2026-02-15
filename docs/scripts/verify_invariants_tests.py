@@ -33,7 +33,7 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 
 # ============================================================================
@@ -944,27 +944,33 @@ class ASTAnalyzer(ast.NodeVisitor):
     
     def visit_FunctionDef(self, node: ast.FunctionDef):
         """Analisa funcoes sync (inclui helpers) e metodos de teste."""
-        prev_function = self.current_function
-        self.current_function = node.name
-        self._handle_function_node(node)
-        self.generic_visit(node)
-        self.current_function = prev_function
+        self._handle_function_common(node)
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef):
         """Analisa funcoes async (pytest.mark.asyncio / async def test_*)."""
+        self._handle_function_common(node)
+
+    def _handle_function_common(self, node: Union[ast.FunctionDef, ast.AsyncFunctionDef]):
+        """Lógica comum para funções sync e async."""
         prev_function = self.current_function
         self.current_function = node.name
         self._handle_function_node(node)
         self.generic_visit(node)
         self.current_function = prev_function
 
-    def _handle_function_node(self, node: ast.AST) -> None:
-        """Processa nós de função (sync ou async)"""
-        # Detectar fixtures usados na assinatura
-        args = getattr(getattr(node, "args", None), "args", []) or []
-        for arg in args:
-            if arg.arg in ['async_db', 'auth_client', 'client', 'db']:
-                self.fixtures_used.add(arg.arg)
+    def _handle_function_node(self, node: Union[ast.FunctionDef, ast.AsyncFunctionDef]) -> None:
+        """Processa nós de função (sync ou async) para fixtures e detecção de testes."""
+        # Detectar fixtures usados na assinatura (incluindo args, posonly e kwonly)
+        args_obj = getattr(node, "args", None)
+        if args_obj:
+            all_arg_nodes = []
+            if hasattr(args_obj, "args"): all_arg_nodes.extend(args_obj.args)
+            if hasattr(args_obj, "posonlyargs"): all_arg_nodes.extend(args_obj.posonlyargs)
+            if hasattr(args_obj, "kwonlyargs"): all_arg_nodes.extend(args_obj.kwonlyargs)
+            
+            for arg in all_arg_nodes:
+                if arg.arg in ['async_db', 'auth_client', 'client', 'db']:
+                    self.fixtures_used.add(arg.arg)
 
         # Contar testes validos vs invalidos (por presenca de pytest.raises)
         name = getattr(node, "name", "") or ""
@@ -1068,7 +1074,7 @@ class ASTAnalyzer(ast.NodeVisitor):
         """Detecta uso de pytest.raises em um método e captura exception types"""
         found = False
         for child in ast.walk(node):
-            if isinstance(child, ast.With):
+            if isinstance(child, (ast.With, ast.AsyncWith)):
                 for item in child.items:
                     ctx = item.context_expr
                     if isinstance(ctx, ast.Call):
@@ -2679,7 +2685,7 @@ def main():
         project_root = script_dir.parent.parent
         
         # Paths
-        invariants_md = project_root / 'docs' / '02-modulos' / 'training' / 'INVARIANTS_TRAINING.md'
+        invariants_md = project_root / 'docs' / '02_modulos' / 'training' / 'INVARIANTS' / 'INVARIANTS_TRAINING.md'
         tests_dir = project_root / 'Hb Track - Backend' / 'tests' / 'training' / 'invariants'
         
         # Parse invariants

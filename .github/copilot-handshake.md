@@ -6,6 +6,24 @@
 
 ---
 
+## Governance Binding
+
+ARCH_REQUEST generation is governed by:
+→ `docs/_canon/ARCH_REQUEST_GENERATION_PROTOCOL.md` (mandatory)
+
+EXEC_TASK generation follows:
+→ `docs/_canon/EXEC_TASK_GENERATION_PROTOCOL.md` (mandatory)
+
+ADR creation follows:
+→ `docs/_canon/ADR_GENERATION_PROTOCOL.md` (mandatory)
+
+Agent roles defined in:
+→ `docs/_canon/_agent/AGENT_ROLE_MATRIX.md` (mandatory)
+
+All AR generation MUST follow "ARCHITECT — READ ONLY" mode.
+
+---
+
 ## Handshake Protocol
 
 ### Step 1: ACK (Acknowledgment)

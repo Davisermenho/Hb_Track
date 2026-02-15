@@ -1,0 +1,31 @@
+﻿ D docs/execution_tasks/CHANGELOG.md
+ D docs/execution_tasks/EXECUTIONLOG.md
+ M openapi.json
+?? 0fb0f76b48a7_add_refresh_tokens.py
+?? alembic_state.txt
+?? docs/ADR/architecture/
+?? docs/ADR/workflows/
+?? docs/_canon/AGENT_BEHAVIOR.md
+?? docs/_canon/AI_GOVERNANCE_INDEX.md
+?? docs/_canon/AI_GOVERNANCE_USAGE_GUIDE.md
+?? docs/_canon/AI_KERNEL.md
+?? docs/_canon/ARCHITECT_BOOTLOADER.md
+?? docs/_canon/ARCHITECT_HANDSHAKE.md
+?? docs/_canon/ARCH_REQUEST_DSL.md
+?? docs/_canon/FAILSAFE_PROTOCOL.md
+?? docs/_canon/GOVERNANCE_MODEL.md
+?? docs/_canon/LANGUAGE_PROTOCOL.md
+?? docs/_canon/_prompts/
+?? docs/_canon/_schemas/
+?? docs/execution_tasks/_archive/
+?? docs/execution_tasks/artifacts/
+?? manifest.json
+?? schema.sql
+?? scripts/_ia/check_logs_compaction.py
+?? scripts/_ia/generate_ai_governance_index.py
+?? scripts/_ia/lint_arch_request.py
+?? scripts/compact_exec_logs.py
+---
+D	docs/execution_tasks/CHANGELOG.md
+D	docs/execution_tasks/EXECUTIONLOG.md
+M	openapi.json

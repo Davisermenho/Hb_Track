@@ -1,0 +1,12 @@
+{
+  "task_id": "ARCH-LOGS-001-FOLLOWUP-SPLIT",
+  "timestamp_start": "2026-02-13T11:10:00Z",
+  "timestamp_end": "2026-02-13T11:20:00Z",
+  "status": "PASS",
+  "short_title": "Normalização de Governança e Particionamento de Escopo",
+  "scope": "Docs",
+  "artifacts": [
+    "docs/execution_tasks/artifacts/ARCH-LOGS-001-FOLLOWUP-SPLIT/drift_inventory.txt"
+  ],
+  "notes_short": "Reclassificação de drifts do ARCH-LOGS-001 em domínios segregados."
+}

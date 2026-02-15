@@ -1,0 +1,80 @@
+name: Governance Protocol Validation
+
+on:
+  pull_request:
+    paths:
+      - 'docs/_canon/_arch_requests/*.md'
+      - 'docs/execution_tasks/**/*EXEC_TASK*.md'
+      - 'docs/ADR/**/*.md'
+      - 'docs/_canon/**/*PROTOCOL*.md'
+      - 'docs/_canon/_agent/*.md'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'docs/_canon/_arch_requests/*.md'
+      - 'docs/execution_tasks/**/*EXEC_TASK*.md'
+      - 'docs/ADR/**/*.md'
+
+jobs:
+  lint-governance-protocols:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+      
+      - name: Validate All Governance Protocols
+        run: |
+          python docs/scripts/_ia/ai_governance_linter.py
+        continue-on-error: false
+      
+      - name: Enforce ARCH_REQUEST protocol
+        run: |
+          python docs/scripts/_ia/lint_arch_request.py \
+            --glob "docs/_canon/_arch_requests/*.md" \
+            --profile compat \
+            --skip-non-arch \
+            --verbose
+        continue-on-error: false
+      
+      - name: Detect Agent Drift
+        run: |
+          python docs/scripts/_ia/validators/agent_drift_detector.py
+        continue-on-error: false
+      
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: governance-validation-report
+          path: |
+            **/*.log
+            **/*_report.json
+          retention-days: 30
+      
+      - name: Comment PR with results
+        if: failure() && github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Governance validation failed. Check workflow logs for details.\n\n**Ensure compliance with:**\n- `docs/_canon/ARCH_REQUEST_GENERATION_PROTOCOL.md`\n- `docs/_canon/EXEC_TASK_GENERATION_PROTOCOL.md`\n- `docs/_canon/ADR_GENERATION_PROTOCOL.md`\n- `docs/_canon/_agent/AGENT_ROLE_MATRIX.md`\n- `docs/_canon/_agent/AGENT_DRIFT_RULES.md`'
+            })

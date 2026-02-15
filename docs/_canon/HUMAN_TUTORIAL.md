@@ -14,7 +14,7 @@
 - **Python 3.9+** com venv configurado
 - **Git 2.30+**
 - **Docker** e **Docker Compose** (para PostgreSQL local)
-- **PyYAML 6.0.1+** (citar `scripts/_ia/requirements.txt`)
+- **PyYAML 6.0.1+** (citar `docs/scripts/_ia/requirements.txt`)
 - **Radon** (para análise de complexidade ciclomática)
 
 ### Setup do Ambiente Python
@@ -34,7 +34,7 @@ pip install -r requirements.txt
 pip install -r ..\scripts\_ia\requirements.txt
 ```
 
-**Evidência:** `scripts/_ia/utils/yaml_loader.py` (linha 17) requer PyYAML 6.0.1+
+**Evidência:** `docs/scripts/_ia/utils/yaml_loader.py` (linha 17) requer PyYAML 6.0.1+
 
 ### Validação de CWD (Current Working Directory)
 
@@ -91,7 +91,7 @@ Get-Content docs\_ai\_context\approved-commands.yml | Select-String "version"
 - **0:** Extração bem-sucedida
 - **1:** Arquivo fonte não encontrado
 
-**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 46-54), `scripts/_ia/extractors/extract-approved-commands.py`
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 46-54), `docs/scripts/_ia/extractors/extract-approved-commands.py`
 
 ---
 
@@ -117,7 +117,7 @@ python scripts\_ia\utils\json_loader.py
 - **0:** Extração bem-sucedida (4 exit codes mapeados)
 - **1:** Arquivo fonte não encontrado
 
-**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 56-65), `scripts/_ia/extractors/extract-troubleshooting.py`
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 56-65), `docs/scripts/_ia/extractors/extract-troubleshooting.py`
 
 ---
 
@@ -144,7 +144,7 @@ Test-Path .github\copilot-handshake.md
 **Exit codes:**
 - **0:** Template gerado com sucesso
 
-**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 95-103), `scripts/_ia/generators/generate-handshake-template.py`
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 95-103), `docs/scripts/_ia/generators/generate-handshake-template.py`
 
 ---
 
@@ -169,7 +169,7 @@ Get-Content docs\_ai\_specs\invocation-examples.yml | Select-String "task"
 **Exit codes:**
 - **0:** Exemplos gerados com sucesso
 
-**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 105-113), `scripts/_ia/generators/generate-invocation-examples.py`
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 105-113), `docs/scripts/_ia/generators/generate-invocation-examples.py`
 
 ---
 
@@ -194,7 +194,7 @@ Get-Content docs\_ai\_specs\checklist-models.yml | Select-String "STEP_"
 **Exit codes:**
 - **0:** Checklist YAML gerado com sucesso
 
-**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 115-123), `scripts/_ia/generators/generate-checklist-yml.py`
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 115-123), `docs/scripts/_ia/generators/generate-checklist-yml.py`
 
 ---
 
@@ -223,7 +223,7 @@ $LASTEXITCODE
 - **0:** Todos os comandos são aprovados
 - **1:** Comandos não autorizados encontrados (ver output para detalhes)
 
-**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 71-79), `scripts/_ia/validators/validate-approved-commands.py`
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 71-79), `docs/scripts/_ia/validators/validate-approved-commands.py`
 
 ---
 
@@ -249,7 +249,7 @@ python scripts\_ia\validators\validate-quality-gates.py "Hb Track - Backend\app"
 - **0:** Código está em conformidade com quality gates
 - **1:** Violações de complexidade detectadas
 
-**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 81-89), `scripts/_ia/validators/validate-quality-gates.py`
+**Evidência:** `IMPLEMENTATION_SUMMARY.md` (linhas 81-89), `docs/scripts/_ia/validators/validate-quality-gates.py`
 
 ---
 
@@ -488,7 +488,7 @@ Test-Path docs\_ai\_specs\quality-gates.yml
 
 Todos os comandos e procedures neste documento são baseados em:
 - `IMPLEMENTATION_SUMMARY.md` (linhas 1-256)
-- Código-fonte em `scripts/_ia/**/*.py`
+- Código-fonte em `docs/scripts/_ia/**/*.py`
 - Artefatos gerados em `docs/_ai/`
 - Documentação canônica em `docs/_canon/`
 

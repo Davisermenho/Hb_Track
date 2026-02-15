@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install -r scripts/_ia/requirements.txt
+        run: pip install -r docs/scripts/_ia/requirements.txt
       - name: TODO - Validate approved commands
-        run: python scripts/_ia/validators/validate-approved-commands.py
+        run: python docs/scripts/_ia/validators/validate-approved-commands.py
         shell: bash

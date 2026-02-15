@@ -1,5 +1,10 @@
 # GUARDRAIL_POLICY_PARITY.md
 
+> **Parent:** [`GUARDRAILS_INDEX.md`](GUARDRAILS_INDEX.md) (Entry point único para todos os guardrails)  
+> **Domain:** Parity Policy (schema.sql ↔ SQLAlchemy models)  
+> **Version:** 1.0.0  
+> **Last Updated:** 2026-02-13
+
 ## Descrição
 Guardrail para parity validation: quando divergência entre schema.sql e models é aceitável vs quando é bloqueante.
 

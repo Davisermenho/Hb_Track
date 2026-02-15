@@ -8,7 +8,7 @@
 
 ## Overview
 
-Successfully implemented all 9 placeholder Python files in `scripts/_ia/` according to ADR-016 and EXEC_TASK specifications. All implementations are fully functional, tested, and ready for production use.
+Successfully implemented all 9 placeholder Python files in `docs/scripts/_ia/` according to ADR-016 and EXEC_TASK specifications. All implementations are fully functional, tested, and ready for production use.
 
 ---
 
@@ -16,7 +16,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
 
 ### 1. Utilities (2 files)
 
-#### `scripts/_ia/utils/json_loader.py`
+#### `docs/scripts/_ia/utils/json_loader.py`
 - **Lines:** 83
 - **Functions:** `load_json()`, `load_json_safe()`
 - **Features:**
@@ -27,7 +27,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
   - Smoke tests included
   - Exit code: 0 (tests pass)
 
-#### `scripts/_ia/utils/yaml_loader.py`
+#### `docs/scripts/_ia/utils/yaml_loader.py`
 - **Lines:** 69
 - **Functions:** `load_yaml()`, `load_yaml_safe()`
 - **Features:**
@@ -42,7 +42,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
 
 ### 2. Extractors (2 files)
 
-#### `scripts/_ia/extractors/extract-approved-commands.py`
+#### `docs/scripts/_ia/extractors/extract-approved-commands.py`
 - **Lines:** 69
 - **Purpose:** Convert `docs/_canon/08_APPROVED_COMMANDS.md` → `approved-commands.yml`
 - **Output:** `docs/_ai/_context/approved-commands.yml`
@@ -53,7 +53,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
   - YAML output with metadata
   - Exit code: 0 (success) or 1 (file not found)
 
-#### `scripts/_ia/extractors/extract-troubleshooting.py`
+#### `docs/scripts/_ia/extractors/extract-troubleshooting.py`
 - **Lines:** 77
 - **Purpose:** Convert `docs/_canon/09_TROUBLESHOOTING_GUARD_PARITY.md` → `troubleshooting-map.json`
 - **Output:** `docs/_ai/_maps/troubleshooting-map.json`
@@ -68,7 +68,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
 
 ### 3. Validators (2 files)
 
-#### `scripts/_ia/validators/validate-approved-commands.py`
+#### `docs/scripts/_ia/validators/validate-approved-commands.py`
 - **Lines:** 79
 - **Purpose:** Verify scripts use only approved commands from whitelist
 - **Input:** `scripts/**/*.py`, `docs/_ai/_context/approved-commands.yml`
@@ -78,7 +78,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
   - Violation reporting
   - Exit code: 0 (all approved) or 1 (violations found)
 
-#### `scripts/_ia/validators/validate-quality-gates.py`
+#### `docs/scripts/_ia/validators/validate-quality-gates.py`
 - **Lines:** 72
 - **Purpose:** Validate code quality metrics against thresholds
 - **Input:** `docs/_ai/_specs/quality-gates.yml`, target code
@@ -92,7 +92,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
 
 ### 4. Generators (3 files)
 
-#### `scripts/_ia/generators/generate-handshake-template.py`
+#### `docs/scripts/_ia/generators/generate-handshake-template.py`
 - **Lines:** 75
 - **Purpose:** Generate agent handshake protocol template
 - **Output:** `.github/copilot-handshake.md`
@@ -102,7 +102,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
   - Markdown template
   - Exit code: 0
 
-#### `scripts/_ia/generators/generate-invocation-examples.py`
+#### `docs/scripts/_ia/generators/generate-invocation-examples.py`
 - **Lines:** 42
 - **Purpose:** Generate invocation examples from EXEC_TASK files
 - **Output:** `docs/_ai/_specs/invocation-examples.yml`
@@ -112,7 +112,7 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
   - Exit code mapping
   - Exit code: 0
 
-#### `scripts/_ia/generators/generate-checklist-yml.py`
+#### `docs/scripts/_ia/generators/generate-checklist-yml.py`
 - **Lines:** 40
 - **Purpose:** Convert checklist markdown to structured YAML
 - **Output:** `docs/_ai/_specs/checklist-models.yml`
@@ -188,37 +188,37 @@ Successfully implemented all 9 placeholder Python files in `scripts/_ia/` accord
 
 ### Utilities
 ```bash
-$ python3 scripts/_ia/utils/json_loader.py
+$ python3 docs/scripts/_ia/utils/json_loader.py
 ✅ json_loader.py: All tests passed
 
-$ python3 scripts/_ia/utils/yaml_loader.py
+$ python3 docs/scripts/_ia/utils/yaml_loader.py
 ✅ yaml_loader.py: Module loaded successfully
 ```
 
 ### Extractors
 ```bash
-$ python3 scripts/_ia/extractors/extract-approved-commands.py
+$ python3 docs/scripts/_ia/extractors/extract-approved-commands.py
 ✅ Extracted 5 categories to docs/_ai/_context/approved-commands.yml
 
-$ python3 scripts/_ia/extractors/extract-troubleshooting.py
+$ python3 docs/scripts/_ia/extractors/extract-troubleshooting.py
 ✅ Extracted troubleshooting for 4 exit codes to docs/_ai/_maps/troubleshooting-map.json
 ```
 
 ### Generators
 ```bash
-$ python3 scripts/_ia/generators/generate-handshake-template.py
+$ python3 docs/scripts/_ia/generators/generate-handshake-template.py
 ✅ Generated handshake template: .github/copilot-handshake.md
 
-$ python3 scripts/_ia/generators/generate-invocation-examples.py
+$ python3 docs/scripts/_ia/generators/generate-invocation-examples.py
 ✅ Generated invocation examples: docs/_ai/_specs/invocation-examples.yml
 
-$ python3 scripts/_ia/generators/generate-checklist-yml.py
+$ python3 docs/scripts/_ia/generators/generate-checklist-yml.py
 ✅ Generated checklist YAML: docs/_ai/_specs/checklist-models.yml
 ```
 
 ### Validators
 ```bash
-$ python3 scripts/_ia/validators/validate-approved-commands.py
+$ python3 docs/scripts/_ia/validators/validate-approved-commands.py
 [FAIL] Found 1 unauthorized command(s)
 # Expected behavior: validation is working correctly
 ```

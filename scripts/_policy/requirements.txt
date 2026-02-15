@@ -1,0 +1,22 @@
+# Scripts Policy — Python Dependencies (Pinned)
+# Version: 1.0.0
+# Last Updated: 2026-02-15
+#
+# CRITICAL: Pin versions to prevent drift from parser/emission changes.
+# Update policy: security patches only (no minor/major bumps without testing).
+
+# YAML parser (required by policy_lib.py)
+PyYAML==6.0.1
+
+# JSON Schema validator (required by policy_lib.py)
+jsonschema==4.21.1
+
+# Transitive dependencies (explicit for reproducibility)
+# jsonschema dependencies:
+attrs==23.2.0
+jsonschema-specifications==2023.12.1
+referencing==0.33.0
+rpds-py==0.17.1
+
+# Install with: pip install -r scripts/_policy/requirements.txt
+# Verify with: pip freeze | grep -E "(PyYAML|jsonschema)"

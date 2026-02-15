@@ -1,0 +1,15 @@
+{
+  "task_id": "ARCH-SCRIPTS-REFACTOR-002",
+  "timestamp_start": "2026-02-15T00:00:00Z",
+  "timestamp_end": "2026-02-15T01:00:00Z",
+  "status": "PASS",
+  "short_title": "Refactor compact_exec_logs.py (idempotency + CLI + exit codes)",
+  "scope": "Scripts",
+  "artifacts": [
+    "docs/_canon/_arch_requests/AR-2026-02-15-SCRIPTS-REFACTOR-COMPACT-EXEC-LOGS.md",
+    "docs/_canon/_arch_requests/VALIDATION_MUST_REPORT_AR-2026-02-15.md",
+    "scripts/compact_exec_logs.py",
+    "docs/_canon/SCRIPTS_GUIDE.md"
+  ],
+  "notes_short": "P2_REFACTORING: compact_exec_logs.py elevado de REFATORAR_ANTES_DE_INCORPORAR para INCORPORAR (CLI argparse, --dry-run, exit codes 0=noop/1=updated, idempotência comprovada). Commit e1f0b10."
+}

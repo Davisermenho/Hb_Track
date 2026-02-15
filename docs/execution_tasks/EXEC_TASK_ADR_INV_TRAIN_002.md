@@ -1452,7 +1452,7 @@ Related: ADR-INV-TRAIN-002
 
 Este é um task de **alta complexidade** mas **alto impacto**. O Gate 2 sozinho elimina ~15% dos erros de rastreabilidade que hoje só são detectados em code review.
 
-**Foco da Fase 1**: Implementar Gate 2 com **qualidade excepcional**. É melhor ter 1 gate perfeito do que 4 gates medíocres.
+**Foco da Fase 1**: Implementar Gate 2 com **qualidade excepcional**. Priorizar qualidade sobre quantidade de gates.
 
 **Próximas Fases** (não incluídas neste task):
 - Fase 2: Extensões ao Gate 3 (SQLSTATE validation, constraint_name structural)

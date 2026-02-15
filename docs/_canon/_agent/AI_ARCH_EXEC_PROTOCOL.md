@@ -26,9 +26,15 @@ Todo ciclo de trabalho deve seguir rigorosamente estas fases:
 4.  **Produto:** Entendimento total do impacto.
 
 ## Fase 2: Pré-Validação (Checklist)
+0.  **Decisão:** Consultar [WHEN_TO_USE_TASK_BRIEF.md](WHEN_TO_USE_TASK_BRIEF.md) para avaliar se TASK BRIEF formal é necessário (5 critérios: Files, SSOT, Time, Gates, Risk).
 1.  **Ação:** Validar a intenção contra AI_PROTOCOL_CHECKLIST.md.
 2.  **Ação:** Gerar Determinism Score (0 a 5).
 3.  **Restrição:** Se Score < 4, refinar a demanda antes de prosseguir.
+
+**Protocol Binding:**
+- EXEC_TASK generation MUST follow: `docs/_canon/EXEC_TASK_GENERATION_PROTOCOL.md`
+- ADR creation MUST follow: `docs/_canon/ADR_GENERATION_PROTOCOL.md`
+- Agent roles defined in: `docs/_canon/_agent/AGENT_ROLE_MATRIX.md`
 
 ## Fase 3: Emissão do TASK BRIEF
 1.  **Ação:** Gerar o documento TASK_BRIEF.md seguindo o template canônico.
@@ -54,7 +60,7 @@ Todo ciclo de trabalho deve seguir rigorosamente estas fases:
 
 # 3. REGRAS DE OURO DO AI ARCHITECT
 
-*   **Não Executar Sem Planejar:** Nunca realize mudanças diretas sem antes passar pelo fluxo de TASK BRIEF para tarefas complexas.
+*   **Não Executar Sem Planejar:** Nunca realize mudanças diretas sem antes passar pelo fluxo de TASK BRIEF para tarefas complexas. Consulte [WHEN_TO_USE_TASK_BRIEF.md](WHEN_TO_USE_TASK_BRIEF.md) para critérios objetivos de escalação.
 *   **Zero Confiança no Executor:** O Architect nunca assume que o Executor (Copilot/Agent) fará a coisa certa por "intuição". Tudo deve ser explícito.
 *   **SSOT é Sagrado:** Se o código divergir do SSOT (db, docs), o código é o que está errado. Corrija o código para alinhar ao SSOT.
 *   **Abortar ao Primeiro Sinal de Caos:** Se uma execução falhar duas vezes pelo mesmo motivo, PARE e reavalie a arquitetura da TASK.

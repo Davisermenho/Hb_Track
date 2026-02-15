@@ -68,10 +68,10 @@ git restore -- `
   "docs/_generated/schema.sql"
 
 git restore -- `
-  "C:/HB TRACK/Hb Track - Backend/docs/_generated/alembic_state.txt" `
-  "C:/HB TRACK/Hb Track - Backend/docs/_generated/manifest.json" `
-  "C:/HB TRACK/Hb Track - Backend/docs/_generated/schema.sql" `
-  "C:/HB TRACK/Hb Track - Backend/docs/_generated/trd_training_permissions_report.txt"
+  "..\docs\_generated\alembic_state.txt" `
+  "..\docs\_generated\manifest.json" `
+  "..\docs\_generated\schema.sql" `
+  "..\docs\_generated\trd_training_permissions_report.txt"
 ```
 
 ### 4) Checklist “antes de rodar guard/gate”

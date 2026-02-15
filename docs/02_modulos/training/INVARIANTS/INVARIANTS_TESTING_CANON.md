@@ -9,7 +9,7 @@
 | Authority | Canon (Canonical Protocol) |
 | Scope | training/invariants/testing — Padrão obrigatório para testes |
 | Last Verified | 2026-02-08 |
-| Depends On | [001-ADR-TRAIN-ssot-precedencia.md](C:/HB TRACK/docs/ADR/001-ADR-TRAIN-ssot-precedencia.md), INVARIANTS_TRAINING.md, `schema.sql` |
+| Depends On | [001-ADR-TRAIN-ssot-precedencia.md](../../../ADR/001-ADR-TRAIN-ssot-precedencia.md), INVARIANTS_TRAINING.md, `schema.sql` |
 | Produces | Test files following DoD (Definition of Done), validation results |
 
 ---

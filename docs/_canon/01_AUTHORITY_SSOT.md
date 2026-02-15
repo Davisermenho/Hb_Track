@@ -23,7 +23,7 @@ Quando há discrepância, responda nesta ordem:
 
 ## Fonte Normativa
 
-**ADR Referência:** [001-ADR-TRAIN-ssot-precedencia.md](C:/HB TRACK/docs/ADR/001-ADR-TRAIN-ssot-precedencia.md)
+**ADR Referência:** [001-ADR-TRAIN-ssot-precedencia.md](../ADR/001-ADR-TRAIN-ssot-precedencia.md)
 
 Qualquer debate sobre precedência resolve-se consultando este ADR.
 

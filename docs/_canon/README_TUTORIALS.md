@@ -38,7 +38,7 @@ Este diretório contém **2 tutoriais canônicos** para utilização da infraest
 
 **Evidências citadas:**
 - `IMPLEMENTATION_SUMMARY.md` (linhas específicas)
-- Código-fonte dos 9 scripts em `scripts/_ia/`
+- Código-fonte dos 9 scripts em `docs/scripts/_ia/`
 - Artefatos gerados em `docs/_ai/`
 
 ---
@@ -78,21 +78,21 @@ Este diretório contém **2 tutoriais canônicos** para utilização da infraest
 ### Scripts Implementados (9 total)
 
 **Utilitários (2):**
-- `scripts/_ia/utils/json_loader.py`
-- `scripts/_ia/utils/yaml_loader.py`
+- `docs/scripts/_ia/utils/json_loader.py`
+- `docs/scripts/_ia/utils/yaml_loader.py`
 
 **Extratores (2):**
-- `scripts/_ia/extractors/extract-approved-commands.py`
-- `scripts/_ia/extractors/extract-troubleshooting.py`
+- `docs/scripts/_ia/extractors/extract-approved-commands.py`
+- `docs/scripts/_ia/extractors/extract-troubleshooting.py`
 
 **Geradores (3):**
-- `scripts/_ia/generators/generate-handshake-template.py`
-- `scripts/_ia/generators/generate-invocation-examples.py`
-- `scripts/_ia/generators/generate-checklist-yml.py`
+- `docs/scripts/_ia/generators/generate-handshake-template.py`
+- `docs/scripts/_ia/generators/generate-invocation-examples.py`
+- `docs/scripts/_ia/generators/generate-checklist-yml.py`
 
 **Validadores (2):**
-- `scripts/_ia/validators/validate-approved-commands.py`
-- `scripts/_ia/validators/validate-quality-gates.py`
+- `docs/scripts/_ia/validators/validate-approved-commands.py`
+- `docs/scripts/_ia/validators/validate-quality-gates.py`
 
 ---
 
@@ -129,25 +129,25 @@ Este diretório contém **2 tutoriais canônicos** para utilização da infraest
 Todos os 7 scripts documentados foram testados com sucesso:
 
 ```bash
-✅ python scripts/_ia/utils/json_loader.py
+✅ python docs/scripts/_ia/utils/json_loader.py
    Exit: 0 (All tests passed)
 
-✅ python scripts/_ia/extractors/extract-approved-commands.py
+✅ python docs/scripts/_ia/extractors/extract-approved-commands.py
    Exit: 0 (Extracted 5 categories)
 
-✅ python scripts/_ia/extractors/extract-troubleshooting.py
+✅ python docs/scripts/_ia/extractors/extract-troubleshooting.py
    Exit: 0 (Extracted 4 exit codes)
 
-✅ python scripts/_ia/generators/generate-handshake-template.py
+✅ python docs/scripts/_ia/generators/generate-handshake-template.py
    Exit: 0 (Generated template)
 
-✅ python scripts/_ia/generators/generate-invocation-examples.py
+✅ python docs/scripts/_ia/generators/generate-invocation-examples.py
    Exit: 0 (Generated examples)
 
-✅ python scripts/_ia/generators/generate-checklist-yml.py
+✅ python docs/scripts/_ia/generators/generate-checklist-yml.py
    Exit: 0 (Generated checklist)
 
-✅ python scripts/_ia/validators/validate-approved-commands.py
+✅ python docs/scripts/_ia/validators/validate-approved-commands.py
    Exit: 1 (EXPECTED: violations detected - validator working correctly)
 ```
 
@@ -157,7 +157,7 @@ Todos os 7 scripts documentados foram testados com sucesso:
 
 Conforme marcado como **PENDENTE** nos tutoriais:
 
-1. **Validar agents autônomos** em `scripts/_ia/agents/` (se existirem)
+1. **Validar agents autônomos** em `docs/scripts/_ia/agents/` (se existirem)
 2. **Confirmar quality-gates.yml** em `docs/_ai/_specs/`
 3. **Documentar scripts adicionais** não cobertos (6 extras além dos 9 principais)
 

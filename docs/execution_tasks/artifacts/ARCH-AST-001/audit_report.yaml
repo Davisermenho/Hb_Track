@@ -1,0 +1,61 @@
+ARCH_AUDIT_RESULT:
+  task_id: "ARCH-AST-001"
+  audit_version: "v1.1.0"
+  final_state: "PASS_WITH_EVIDENCE_GAPS_NOTED"
+  closure:
+    status: "CLOSED"
+    rationale:
+      - "Há evidência suficiente de comportamento-alvo (detecção async) + não-regressão (INV-TRAIN-009 PASS) + workspace clean."
+      - "Alguns itens permanecem com ancoragem fraca (paths canônicos não explicitados em E1/E5), registrados como gaps."
+
+  evidence_review:
+    E1_event_json:
+      status: "PARTIAL"
+      gap:
+        - "Path canônico não explicitado (esperado: docs/execution_tasks/artifacts/ARCH-AST-001/event.json)."
+    E2_root_cause:
+      status: "PASS"
+    E3_core_fix_snippet:
+      status: "PASS"
+      checks:
+        - "visit_FunctionDef e visit_AsyncFunctionDef convergem para handler comum."
+        - "_has_pytest_raises includes AsyncWith."
+    E4_diff_stat:
+      status: "PASS"
+      indicates:
+        - "event.json versionado"
+        - "repro test versionado"
+        - "verify_invariants_tests.py alterado"
+        - "índices atualizados"
+    E5_repro_artifact:
+      status: "PARTIAL"
+      gap:
+        - "Path canônico do repro não foi explicitado; somente nome."
+    E6_repro_run:
+      status: "PASS"
+      indicates:
+        - "5 funções detectadas com flag Async correta"
+        - "FAIL esperado por violações"
+    E7_inv_train_009:
+      status: "PASS"
+      exit_code: 0
+    E8_clean_state:
+      status: "PASS"
+      git_status_porcelain: "EMPTY"
+      git_diff_stat: "EMPTY"
+
+  governance_gaps_register:
+    - gap_id: "GAP-ARCHAST-PATH-001"
+      description: "E1/E5 não trouxeram paths canônicos completos dos artifacts."
+      disposition: "NON-BLOCKING (closure permitido); recomendar evidenciar paths canônicos nas próximas tasks."
+
+NEXT_STEP_MENU:
+  options:
+    - action_id: "INV-TRAIN-009_REFERENCE_RUN"
+      title: "Promover INV-TRAIN-009 a invariante de ouro (baseline + gates)"
+      required_inputs:
+        - "stdout completo do comando canônico + path do teste"
+    - action_id: "AST_REGRESSION_TESTS_ADD"
+      title: "Adicionar testes unitários do ASTAnalyzer no próprio verificador (evitar regressão)"
+      required_inputs:
+        - "path do módulo/verificador onde os testes devem residir"

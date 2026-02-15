@@ -90,14 +90,6 @@
       "sha256": "9ffe7ddcae301674dbd8e4f380bc26ac86c0b3d765b3425be9dbafdd8e8a1962",
       "size": 256
     },
-    "AGENTS.md": {
-      "sha256": "a7ec6bca85032878578858110493831dac80cb753be80c6740904fd0f80c479a",
-      "size": 648
-    },
-    "CLAUDE.md": {
-      "sha256": "c02acbbf5b045ce22723584b400ba868d932437d3641c3d5651ced2c44eedc9e",
-      "size": 425
-    },
     "_archived_e2e\\reset-db-e2e.ps1": {
       "sha256": "a68157f4d818a46fe0d858966a340e33ea68e608eea7aef1f7bbdec44a697b32",
       "size": 13840
@@ -183,8 +175,8 @@
       "size": 4747
     },
     "app\\api\\v1\\routers\\auth.py": {
-      "sha256": "2dd3ae02ab01ed3ff717e5104b4952960f76c6ce9c413ca50fcc92ff8c0a49b9",
-      "size": 77332
+      "sha256": "9b4aeedc9f2f51f93277e492dab0d4c5df1ea7de14df9fff40239a224ac9430a",
+      "size": 84439
     },
     "app\\api\\v1\\routers\\categories.py": {
       "sha256": "bae8419b1aef2b828cd152d76f2538cb333f9f620ba549de945b60c5182ee4be",
@@ -407,8 +399,8 @@
       "size": 5051
     },
     "app\\core\\context.py": {
-      "sha256": "39e5767a1133ea1253ba0dc95ef42de4643e8af880f8eacb8bbc18ed7bbc3838",
-      "size": 16852
+      "sha256": "ec45f380898c11e40300170241e1362f6dbe146174115d0d7f8fac7f74b789cb",
+      "size": 19573
     },
     "app\\core\\db.py": {
       "sha256": "57e8ae9ad9428f13f92bebb16bd6e6609107f4058b582b9c5c6f2095a71d1e41",
@@ -431,8 +423,8 @@
       "size": 17465
     },
     "app\\core\\logging.py": {
-      "sha256": "f99189189da99c0f2f46487b17b2a345fd15b363de4d1beee22041e43f65cddc",
-      "size": 3108
+      "sha256": "26846593618e9e555627ced59ae8fce03faa7baff92455266155cca6425cc245",
+      "size": 4823
     },
     "app\\core\\middleware.py": {
       "sha256": "5460db71f85935c2fa2fe611214e4a41575133223f51b7eb7d18ef3daedcc4f4",
@@ -447,32 +439,44 @@
       "size": 12089
     },
     "app\\core\\rate_limit.py": {
-      "sha256": "885a3f929edde37bbece506a295ca1bbb668d5c22e6cf2057025b0bbb0acaf50",
-      "size": 2105
+      "sha256": "f80ff2ae271468f1fc358104261933ad5acb8a9d93b49e76f791b1338495d714",
+      "size": 2129
     },
     "app\\core\\scope.py": {
       "sha256": "168c11382f375a259f20b531462b69547613f2dc12bcaf2cb3eabeb4abbd3626",
       "size": 1607
     },
     "app\\core\\security.py": {
-      "sha256": "2aaddc92089b182272f4c1d9551a0b6c3805f2232868fff811ff35f8aa0a499c",
-      "size": 4518
+      "sha256": "af6baa76ef0fbd41ae6232fa81e3fa9155872fd8cdee0410d9571c833163ce4f",
+      "size": 5068
     },
     "app\\core\\websocket_manager.py": {
       "sha256": "e2c8e053a69ba1bed8b04583a57b02be2ec081ee06957d4682211d383524865f",
       "size": 9037
     },
     "app\\main.py": {
-      "sha256": "ebb69c817e0735e0edd923c11060417ae37fe12ab0407684a09db34ca725a1b4",
-      "size": 12668
+      "sha256": "116d566f51a5e32895862526d178acd1461f0043effdcef08ed5ad468e1be243",
+      "size": 12905
+    },
+    "app\\middleware\\__init__.py": {
+      "sha256": "2cecb16e5a7d6e809347c3eeb860c7178e9de7f46c54ac2aaa18161d93354ff7",
+      "size": 123
+    },
+    "app\\middleware\\csrf.py": {
+      "sha256": "22c6a9086a5cb11c95ee2f7aae933c43feb60e2344d43e0c2077ca78f2ec355c",
+      "size": 2771
     },
     "app\\models\\__init__.py": {
-      "sha256": "16e77f86949ead475a4c0ddb8b94797d0b7dadaba57574406ecff4a79e5659e6",
-      "size": 4331
+      "sha256": "be08c511a4eaaf08f8f6024c518f9bb0e19730cdaf659de9baad2f5d5c80bfb0",
+      "size": 4382
+    },
+    "app\\models\\advantage_states.py": {
+      "sha256": "c46a68daf77abeb08c66ac43ef88c78cbe72601f0b9e77a73dde98d7d068b8c4",
+      "size": 1130
     },
     "app\\models\\athlete.py": {
-      "sha256": "719f33da0ac68e768fe8eef4d6539df064d735d3ecc0f34f93385988cf94ffce",
-      "size": 9940
+      "sha256": "16047072141bf273d7228649537277f84f04789bcaeddf758944d92a83c9182d",
+      "size": 9921
     },
     "app\\models\\athlete_badge.py": {
       "sha256": "f2c7383c5b9dad171bdb84fb407599c35d14aa1000bf626513785c91b940fa4a",
@@ -534,6 +538,14 @@
       "sha256": "7ce59ac28ccdc0ad19b5c4a1e82dac0329bdbf5d6a1434197115b26b9109b7d3",
       "size": 3206
     },
+    "app\\models\\event_subtypes.py": {
+      "sha256": "28739db3779cff87d82d496a4220e6463453923a7a1c5eeab5391eed4f5a93f0",
+      "size": 1332
+    },
+    "app\\models\\event_types.py": {
+      "sha256": "77c36d0460ed1cb2284c6fb348af3b759cb0362547fee2be632be67218d4c1cf",
+      "size": 1177
+    },
     "app\\models\\exercise.py": {
       "sha256": "e0efd0cc762374b239f2f90402559bf68204e551ce778962f6783f1de3d26ccf",
       "size": 2732
@@ -569,6 +581,10 @@
     "app\\models\\match_period.py": {
       "sha256": "921ec782b8b84ae8563fed84e638b571f01f2f178cc08ad8e091671ef6fc364c",
       "size": 1876
+    },
+    "app\\models\\match_possessions.py": {
+      "sha256": "5c4fadb28b7efe2b72efe1314955fb01a5484b989b93402d24e801d3644e5be5",
+      "size": 2997
     },
     "app\\models\\match_roster.py": {
       "sha256": "89e916977d7bd4b65e2dd6eb221d7f3dbca92ec9b4ed99592a5ecb78c8376aa3",
@@ -609,6 +625,14 @@
     "app\\models\\person.py": {
       "sha256": "6a6d498903255c2a4e5fb88dbed148fa85df30109862de0215fbe68538f512fe",
       "size": 21956
+    },
+    "app\\models\\phases_of_play.py": {
+      "sha256": "7aaa40af47e57f9d715c6daedd3c4f0c827c33fc8b1fbbdfad023548fed4a0cd",
+      "size": 1029
+    },
+    "app\\models\\refresh_token.py": {
+      "sha256": "324184c809af03eb6940078599034742203f946058af047f78ac9b73448f0ec3",
+      "size": 1995
     },
     "app\\models\\role.py": {
       "sha256": "c76765411f50e778aed37f91dc682da23ea61ff697e731b2a0cfe0b3c37d1604",
@@ -931,8 +955,8 @@
       "size": 9710
     },
     "app\\services\\email_service.py": {
-      "sha256": "9b00c416a5b95eb8dd005df304b7d4c9093b9c72dd05603315d6b402d393b469",
-      "size": 10927
+      "sha256": "52f7c649a4ca0d935ad84b4499f21c3fa739a1b8b532dcf982a4492213d511bd",
+      "size": 8865
     },
     "app\\services\\exercise_service.py": {
       "sha256": "d7157a93b1aa57545231139e8a34a3ff4ffcddf87ee178d3d1ee9958e2e56328",
@@ -1141,38 +1165,6 @@
     "autogen.log": {
       "sha256": "228ec4c2588152e6c21523c642cdd012686e375160d7edf6208e854ab4a74965",
       "size": 3838
-    },
-    "check_athletes_columns.py": {
-      "sha256": "deb62bbd0187d8d318079c10a9ae37671e17e3a77e7a8d5182429682e34f70a2",
-      "size": 530
-    },
-    "check_coord_train.py": {
-      "sha256": "aa4e788a9fe21823a62606480b42f81c52841497d8b8bf2edfba0314a39e22f1",
-      "size": 1146
-    },
-    "check_exercises_data.py": {
-      "sha256": "4bd7f1d4b96a579ec2939c97d80eafcf952b3ec77d6316f5a36c16a3494ca748",
-      "size": 743
-    },
-    "check_migration.py": {
-      "sha256": "fc2ceeca58e28bbba4316ece91f54deae290cc903df7d4a43c776c634effca84",
-      "size": 402
-    },
-    "check_seed_data.py": {
-      "sha256": "966fc194805ace61464c1daae8243c6d968d6144ad247a7e12bfab1a5482e1e7",
-      "size": 1130
-    },
-    "check_team_registrations_columns.py": {
-      "sha256": "39fa6b49690e9d0f92aeff8143b79141eb84f38a748ece2f3f85c365c3837505",
-      "size": 550
-    },
-    "check_users_temp.py": {
-      "sha256": "051ce6d48d34419dc394dff42dad9f511ac150a70ad8d04cfe0734f86a504736",
-      "size": 991
-    },
-    "create_roles.py": {
-      "sha256": "f730f7a65d515e2cc1c30adf82187077f6aa5fb9d835885248495f7ad24429a6",
-      "size": 883
     },
     "db\\alembic\\env.py": {
       "sha256": "a1fb0c2cde9cd0cbda5efc752220d68cc4a387a53b2deb24468182691dbe6e1e",
@@ -1390,6 +1382,10 @@
       "sha256": "950ec027e2f60a8f9f937b41a349b6273f93776fe837170155da74cd388f7c5f",
       "size": 21394
     },
+    "db\\alembic\\versions\\0fb0f76b48a7_add_refresh_tokens.py": {
+      "sha256": "5a22350b9e15c0380dd9fc347b5fa81ede112b478d8aba288ef3749f969d4c9e",
+      "size": 1883
+    },
     "db\\alembic\\versions\\4e003155504c_create_session_templates_table_with_.py": {
       "sha256": "a6a119045639714faaf7aa77def0979b3e5ddf1bd9ed9b2e24d5c79b557e9ebd",
       "size": 6535
@@ -1422,121 +1418,13 @@
       "sha256": "5d32dfe4d0de49fa350905d26f6a370cf93fa3a1708108a5bf32652c2cae48a3",
       "size": 1147
     },
-    "db\\scripts\\add_reports_alerts_indexes.sql": {
-      "sha256": "ee94069e8b75b7f48c1079536af6f7c59bfbd39ecd0f25dd0135cbd30191a4f0",
-      "size": 4608
-    },
-    "db\\scripts\\backfill_simple.py": {
-      "sha256": "f181005135bf1c4130253f9da60bc80bc18f55c38c6238ae5c8e7067d5ef42d5",
-      "size": 3304
-    },
-    "db\\scripts\\backfill_training_sessions_season_team.py": {
-      "sha256": "df393176faa5764be0fa65e4d65174dd3f0382dc5d81d3bb241e3f7d810ddb41",
-      "size": 11141
-    },
-    "db\\scripts\\refresh_all_materialized_views.sql": {
-      "sha256": "48c018182773ec2e7cda81ea92c26e04a7476b25069565a3aec49c466615c755",
-      "size": 3537
-    },
-    "db\\seed_exercises.py": {
-      "sha256": "d8df7484d73938fc322e91620f3f235624dfd83840db6065d7b228ffa3a646d0",
-      "size": 6521
-    },
-    "db\\seed_minimo_oficial.sql": {
-      "sha256": "a1a8a9d2917b40dabd529676f467e6bfb1d0e5d70ec0a040e0334284e6e68abd",
-      "size": 10523
-    },
-    "db\\seed_test_users.sql": {
-      "sha256": "7ecedb31e7fd415a56cea26d1a977d47e80cf5887648edcd89b5ff8943e49ac7",
-      "size": 5725
-    },
-    "db\\seeds\\004_seed_organization.py": {
-      "sha256": "f5b5b2002cae611dd60cbb5bc358f9d92ad7c8857560deff00e0b7c21adb9a81",
-      "size": 1127
-    },
-    "db\\seeds\\README.md": {
-      "sha256": "0402767216a02741d7e46ccdd57362e9a15a4ea35c15b58deeb9efeef4612082",
-      "size": 3703
-    },
-    "db\\seeds\\__init__.py": {
-      "sha256": "f03198582b2a440ab5aecba58aef7b2b5817c9087d89b9b883c0633bc10aada3",
-      "size": 342
-    },
-    "db\\seeds\\_archived\\001_seed_roles.py": {
-      "sha256": "e69ec1884c5eecce34193e11181ea9e7ed10f48a922b0093781096dd2b4ff68c",
-      "size": 1153
-    },
-    "db\\seeds\\_archived\\002_seed_superadmin.py": {
-      "sha256": "60eaf3a5b9b7c58d08eb8196cd62f5fc3a8714378a5ce66301cb5fcffccb017c",
-      "size": 1839
-    },
-    "db\\seeds\\_archived\\005_seed_positions.py": {
-      "sha256": "cd0cfd2aa8d995628a27a6b9d1cca5f590d4696a14a9b135e17aa3d543b18dde",
-      "size": 3176
-    },
-    "db\\seeds\\_archived\\006_seed_permissions.py": {
-      "sha256": "bf6bd3fdd739ed601289c884bfad280aab87fa391eacb09ca013d0ee011e1545",
-      "size": 6804
-    },
-    "db\\seeds\\_archived\\007_seed_role_permissions.py": {
-      "sha256": "57871281b681c8c063d600c0ccd5c0f40fabb7eb8df78d9cc50e86737533eac9",
-      "size": 7569
-    },
-    "db\\seeds\\_archived\\008_seed_schooling_levels.py": {
-      "sha256": "3eee3398b127846a89eb1e337331cc74bcc1770a6022d972b37458be3cc1d04a",
-      "size": 1651
-    },
-    "db\\seeds\\_archived\\run_all_seeds.py": {
-      "sha256": "3756b69e0eeb1977022670ad9bcfb2b3040533f7d73d110469e54f037f0a47fe",
-      "size": 3576
-    },
-    "db\\seeds\\_archived\\seed_test_athletes.py": {
-      "sha256": "5d1dc9de9bf74f9e537aa40e760ad1c33e2d3a42692ec6e4dd5408a22eedebe7",
-      "size": 6273
-    },
-    "db\\seeds\\run_test_seeds.py": {
-      "sha256": "685beec172d922780e96d14f20791d8ed4eeed09b8a63d762610195ab4916154",
-      "size": 1519
-    },
-    "db\\seeds\\seed_test_organization.py": {
-      "sha256": "b3b0aec105bf3f92a2c7ba188078147708dafeb45eb3e9987493ba69869af29a",
-      "size": 3836
-    },
-    "db\\seeds\\seed_test_users.py": {
-      "sha256": "96d60a9e6df1513f3af5d3bae9bc9edfddada56c1770e457d719ec212a82d9d8",
-      "size": 5505
-    },
-    "decode_token.py": {
-      "sha256": "9b792c5f02bf2715d0bfc78b0dfeb4d96b6d5d8eb7b7adbe807595ccca8626ef",
-      "size": 728
-    },
-    "decode_token_manual.py": {
-      "sha256": "5012b6cd192ed3b9d542ef451dfde4bf7c3ac039153e2ac35441a20f1bffb79b",
-      "size": 1122
-    },
-    "fix_migrations.py": {
-      "sha256": "ac132adaf8cff39cc287eaaa0f3ebf7a0857d0063317252e38c3db524d9e1f7c",
-      "size": 1738
-    },
-    "fix_superadmin_pwd.py": {
-      "sha256": "d4e510221815d003f499823ce12a57a467688c65b8e3c11aa816dbcfe5c1c0e9",
-      "size": 1151
-    },
-    "generate_migration_hash.py": {
-      "sha256": "51d68938d89e45024871f9476139fb3bb00140fdf58549fd7facdec01c02bd49",
-      "size": 675
+    "docs\\QUALITY_METRICS.md": {
+      "sha256": "689b66289a2f552dcbbc5b1d2a8b7aa9260f0d152d79c65c2f19c8122a785f9f",
+      "size": 37155
     },
     "guard_check.log": {
       "sha256": "a99097af46cda91a853bd1ed4b27182741851c9f60b2e78fd17ff65bb6b8f44b",
       "size": 650
-    },
-    "import_legacy_training.py": {
-      "sha256": "e43aeb2c7a6ce7a5d4e2d907f208c776445d71b1ee90ce836cbaddf56ff3b4e3",
-      "size": 20177
-    },
-    "list_routes.py": {
-      "sha256": "bdca0d8eff8a151f52d423adda48024f79087a06056042015747e4279aed3a8d",
-      "size": 227
     },
     "nodemailer": {
       "sha256": "84b74f8830b0a02bc9f63aa31bed4bab6916f6fc5cf28ffc6bca5296508a803d",
@@ -1554,281 +1442,13 @@
       "sha256": "45975cd81f90b38f99aa6bc5fc5ddbf88b765c48663a0362cc93cd627bcc0de7",
       "size": 1375
     },
-    "reset-db-e2e.ps1": {
-      "sha256": "50ca69139e2fdef582c77e7038b08f2d485f5444d1cf3e6a8ea8a1e47fccaa6b",
-      "size": 9129
-    },
-    "reset-hb-track-dev.ps1": {
-      "sha256": "8e81e1d24f69311f10dd98ab35b8b900c1547051a7aabd5b8940c1beaf4bcc8d",
-      "size": 8791
-    },
-    "scripts\\_load_env.ps1": {
-      "sha256": "67e473cc6b1a3a7841ec722a86643cbd5b7ffef3f1e7ebfb7d8285634e4c3e8d",
-      "size": 733
-    },
-    "scripts\\add_status_headers.py": {
-      "sha256": "0a25c916438ac4289af74ee1f472b4b8c4cfa901f132123bd67f44489717f533",
-      "size": 6202
-    },
-    "scripts\\agent_guard.py": {
-      "sha256": "cad7c13a30003d061db2a2eeb258b688b5e4d8ab26ecb0462a7d9e925d6dd2f2",
-      "size": 8859
-    },
-    "scripts\\apply_migration_0044.py": {
-      "sha256": "e2125f580ed763c1d862280d27e19926cb6252478df1337d2734985f5eb1c02b",
-      "size": 4567
-    },
-    "scripts\\autogen_model_from_db.py": {
-      "sha256": "a2efc75886b7e860eae8186a3d1b72f4ca967bda7b4e9eff27854a29881bf998",
-      "size": 36210
-    },
-    "scripts\\check_and_fix_matches.sql": {
-      "sha256": "06505dfb81cf1fcee77c8f3ef86a5fd1c7facb13b609538ca9a55716cb92cbb3",
-      "size": 2855
-    },
-    "scripts\\check_constraint.py": {
-      "sha256": "27063115bf0708863456a5508170c0f09bd24409382d30396cfdf2471e7ecca9",
-      "size": 1088
-    },
-    "scripts\\check_e2e_status.py": {
-      "sha256": "f9982e051918aeaaff0f4858df25c86470703e2d46c6dde38469bfde26a67e15",
-      "size": 3615
-    },
-    "scripts\\check_ficha_unica_db.py": {
-      "sha256": "ceb50d4ff54f49e167d1c99b9ffb8b6a9fabef5710c9b072f1886366b222ceef",
-      "size": 9254
-    },
-    "scripts\\check_ficha_unica_tables.py": {
-      "sha256": "e7a2f7e53a656f804c5aa3e69ad738bfe62d76d9cefafedfac428035c317661f",
-      "size": 5673
-    },
-    "scripts\\check_matches_e2e.sql": {
-      "sha256": "b5333a77fd9caffb5f0dacce81f88be27850709ca7df8534758360054ce60bc4",
-      "size": 575
-    },
-    "scripts\\check_schema.py": {
-      "sha256": "46ad753c7f4c17668abcf71eec2be3c6eb21c17976f0b6f874dab2fec3447e8f",
-      "size": 286
-    },
-    "scripts\\check_superadmin.py": {
-      "sha256": "f7bbd39ed4eb28e7f8dbe073e731850753d0b13acde6e4fa9a16e88fc2d6b888",
-      "size": 661
-    },
-    "scripts\\check_team_memberships.py": {
-      "sha256": "3ad3c416916d7200a26cd9861f0b7b560c2419fe4568f998f84b6967b4c25018",
-      "size": 770
-    },
-    "scripts\\check_training_sessions_schema.py": {
-      "sha256": "23b925da134811b75c812bb63c1fb64d35df3f9a310b62e5ff61d64730cd8bfb",
-      "size": 1512
-    },
-    "scripts\\create_competitions_tables.py": {
-      "sha256": "2bf63af7f03b9181e7d89db9fa1a0b873c37007a80a308036c915f224bb50659",
-      "size": 3973
-    },
-    "scripts\\create_test_users.py": {
-      "sha256": "4d82851625caa1e7db82d707d362f7e759aec13a3319aa9c5a46e13a30007fd7",
-      "size": 3425
-    },
-    "scripts\\create_view_seasons.py": {
-      "sha256": "2a55551c0fd8d62930e667ade13def9305b4c7189bad9738f6cc3e7c6395072e",
-      "size": 1680
-    },
-    "scripts\\discover_tables_without_models.py": {
-      "sha256": "4070028466a3b491f4088d822418084d4aa1c0f65890a06adaf797e2e9fe8eda",
-      "size": 4331
-    },
-    "scripts\\discover_tables_without_models.py.bak": {
-      "sha256": "c951cee318f363c12fe1b2d8a21d52acfe9ea6f4a133beb35e19ff497ae33735",
-      "size": 1645
-    },
-    "scripts\\fix_superadmin.py": {
-      "sha256": "8213c9f6df853bf68b8ea2abc15a7689ffe818c798fc81e6610684ea8f3e0623",
-      "size": 1532
-    },
-    "scripts\\generate_docs.py": {
-      "sha256": "fa042e7b86d8f67292eb06b51d57ef7d22eb258fc16eb4854417fec45d92f9ab",
-      "size": 18032
-    },
-    "scripts\\generate_docs.py.bak": {
-      "sha256": "8405f732da9ce36a58b25cb285880cf02175b026243d58eaf1b41ca8c4b01f83",
-      "size": 16152
-    },
-    "scripts\\generate_password_link.py": {
-      "sha256": "6ed98070aa8d00aec9d7105e2a8184ede24547a0306d94b10aacb2584fe98e9b",
-      "size": 2972
-    },
-    "scripts\\generate_v1_2_migrations.py": {
-      "sha256": "0c7347fa2c74f8e9c9a5e23b2a9d2c50fb9e79f33cbd423830d01205c7eb4b6a",
-      "size": 9969
-    },
-    "scripts\\get_token.py": {
-      "sha256": "46da75d0dcebd44e8e2c846abd4c66be76e81414790247a2edd5b054860ef42e",
-      "size": 622
-    },
-    "scripts\\inv.ps1": {
-      "sha256": "e7f6299f808b73a5d3305b67358aa5bdceeea3ce01f967a647114304bfae4ae5",
-      "size": 527
-    },
-    "scripts\\list_all_users.py": {
-      "sha256": "0dbf6bc3f3244bc38a9f44fe77e3b857d60fe4d604e229d2c6b2e36a6aabbb27",
-      "size": 1691
-    },
-    "scripts\\manual_login_test.py": {
-      "sha256": "1b0a765cd72f1f1fc6b433afbbfeb7919decf90eaa5cdf1fbf810b372e43f90e",
-      "size": 1600
-    },
-    "scripts\\model_requirements.py": {
-      "sha256": "6e7cdd40d14402dca48ac2109999d8f3efff95bb40b570dea370524261bc8b99",
-      "size": 43232
-    },
-    "scripts\\models_autogen_gate.ps1": {
-      "sha256": "5691c9e0e0c0d9570d16da67e8c6d2fa4158c0eed235113bb6b7d7dfd9ad1825",
-      "size": 7118
-    },
-    "scripts\\models_batch.ps1": {
-      "sha256": "6e1f8f8356dd811f197213f3ea599694cdbddd27c042a555832d914255f66ae4",
-      "size": 13661
-    },
-    "scripts\\new_table_workflow.ps1": {
-      "sha256": "f2f639cd6b35b8812c8bc4c557b111e977eb1d220cf061e79f1cbc5f03bdef7f",
-      "size": 1257
-    },
-    "scripts\\parity_classify.py": {
-      "sha256": "9200067b8af8e8ceddd4e321a14a04b9adf9a3d5c61a5ea313951cb565e0252c",
-      "size": 6927
-    },
-    "scripts\\parity_gate.ps1": {
-      "sha256": "ac56e18ce8ddffbf78a2afbec2114ab7a6fa76833a7cbb30d2d7cf5043f6f33b",
-      "size": 4208
-    },
-    "scripts\\parity_scan.ps1": {
-      "sha256": "cb41544f49447c1426f65c58d6671f2fc3c75029802624fd522e29012a826fa9",
-      "size": 5546
-    },
-    "scripts\\process_email_queue.py": {
-      "sha256": "48283e4f5f732932705359a082fcddde32a4d2dae514e30c019c2ec118aeda4f",
-      "size": 1598
-    },
-    "scripts\\seed_e2e.py": {
-      "sha256": "39759f0c8e3b87244a0775d95e7aa72bb62247b4ae5ee712d573df8eb8cd4027",
-      "size": 65335
-    },
-    "scripts\\seed_e2e_canonical.py": {
-      "sha256": "0fe30e34090cf844855b864687d091b17b6291c1aa60b2d6e4ed2912460200b4",
-      "size": 52790
-    },
-    "scripts\\seed_v1_2_initial.py": {
-      "sha256": "3ce5d4344f934261ec9279782c92082a916ff554a6942b8efd2b378f26661ce7",
-      "size": 10867
-    },
-    "scripts\\set_admin_password.py": {
-      "sha256": "bc9a17f35ffb2186114aed567b7457e7fd424e6dace0a1538ac7052d9621fe43",
-      "size": 479
-    },
-    "scripts\\set_superadmin_password.py": {
-      "sha256": "1aa36a3147b869e4341dff11ddeac3aabe74192bf911361d288f954cfc9bded9",
-      "size": 475
-    },
-    "scripts\\setup_super_admin_password.py": {
-      "sha256": "f1885afb0d1eee63dfa7bddfc2260594010c93837e46f72805de40593fe59f80",
-      "size": 3651
-    },
-    "scripts\\setup_test_user.py": {
-      "sha256": "56df1ad47ca4dcd1656a42eb454be02b2783b50ffc5fb6353ff49f1662d47146",
-      "size": 2149
-    },
-    "scripts\\test_cloudinary_upload.py": {
-      "sha256": "fde35c397dd595fc651a4c2b28d1e3c4bc997742185d161dd76457e325b0efa4",
-      "size": 10014
-    },
-    "scripts\\test_db_connection.py": {
-      "sha256": "638fe6c05d78ca180e477fb1de2fc8a71e1f7552fe1e5e19502130aac6e3f537",
-      "size": 2182
-    },
-    "scripts\\test_email.py": {
-      "sha256": "2e320c7afc3f55b79c0091ce109bfab3b4c469fc6dfb215a6a65f4aaf19ebd80",
-      "size": 3226
-    },
-    "scripts\\test_fase4_endpoints.py": {
-      "sha256": "fc6acc513b0e79c49e45dd85538feab698f517f6105f1df8c549402627921385",
-      "size": 8172
-    },
-    "scripts\\test_integration.py": {
-      "sha256": "aade38b930acc6830087e7fef4d5305477a02a18e9285754bc2bf0889ae1fd4d",
-      "size": 4712
-    },
-    "scripts\\test_login.py": {
-      "sha256": "769be0bb40d40dce600c408a048ba29b14c5d8c3d3ff0fb8bb4bb1e2d6478c0d",
-      "size": 1218
-    },
-    "scripts\\test_resend.py": {
-      "sha256": "6a3b57a00716186f79102ec42052899dd6929e4ecde3e95af57141b9716cf98b",
-      "size": 5266
-    },
-    "scripts\\validate_fase0.py": {
-      "sha256": "f57d156970e44b955be2119abc0d509dba9be7ff95917d2a92899b8cddaf4f5c",
-      "size": 7945
-    },
-    "scripts\\validate_fase2.py": {
-      "sha256": "48c230716aaf1abb4ae9dd68ad63a9ade5f0ffab597691349c7c78f584763e3c",
-      "size": 10679
-    },
-    "scripts\\validate_fase3.py": {
-      "sha256": "080f5c5d021b300fd6c78a609ff3b1424e0cbd3babd00111a148458ad244b3d2",
-      "size": 9891
-    },
-    "scripts\\validate_fase4.py": {
-      "sha256": "0d258827215d74d88e5e5a1985f3bce199bb33399e324791aa08fabedf85714c",
-      "size": 9194
-    },
-    "scripts\\validate_ficha_unica_tests.py": {
-      "sha256": "a8b8dbd68dd2651ba153f7232b46edf4b9ae035b1bf510329efcbc6a85772ead",
-      "size": 5161
-    },
-    "scripts\\validate_integrations.py": {
-      "sha256": "f79b58d840adfaa5ead522bc7473519849221a5ea12afce2691ea0c691b98d01",
-      "size": 10443
-    },
-    "scripts\\validate_rag_conformance.py": {
-      "sha256": "7c1b28965dd2cbcd32aa4bf1d3f4ec2d181853a09ee83d0d5cda0b620383ecfe",
-      "size": 16585
-    },
-    "scripts\\verify_superadmin_password.py": {
-      "sha256": "f296bbc420592b83c3f61d396a3a278fc46964c49c5bc68241d9f4e115d8e1b5",
-      "size": 946
-    },
-    "services\\email_service.py": {
-      "sha256": "52f7c649a4ca0d935ad84b4499f21c3fa739a1b8b532dcf982a4492213d511bd",
-      "size": 8865
-    },
-    "test_api_exercises.py": {
-      "sha256": "b9faefe81ab0707cc209b37e5a10d10a6a2849d247bd6a6ace657f4086a53cc3",
-      "size": 1171
-    },
-    "test_api_routes.py": {
-      "sha256": "550f7b5caf64523ba86f8be9934f74d6f99d1c8366e53fe4d8ccdc5d7baedfa8",
-      "size": 527
-    },
-    "test_login_superadmin.py": {
-      "sha256": "c04ad84bd10d7e0684f146d991de47e4178418a01f393ca1a2e2530e361038eb",
-      "size": 1104
-    },
-    "test_main_simulation.py": {
-      "sha256": "f7850f360c636e3099725dcae376c016a5e6f5ca04aa81e98caca68652dbfd4b",
-      "size": 1048
-    },
-    "test_migration_hash.py": {
-      "sha256": "dcdf9327fd8cba9d473ecb6fae84eb723a466581488f8ae6d6dd272d8cf21738",
-      "size": 1570
-    },
-    "test_pwd.py": {
-      "sha256": "f851b5ce1eba435300881934efb191f9467e0a03007f15e53e95defab169e589",
-      "size": 276
-    },
-    "test_router.py": {
-      "sha256": "245d6e01f56f555441aa3407b46e207505ebc7c9ba398b25324b4dd20e97e342",
-      "size": 207
+    "run1.log": {
+      "sha256": "d05137e41762df40914db29cb51210c945ad1639391aa3b20e20e46a70c1ac3f",
+      "size": 99
+    },
+    "scripts\\compact_exec_logs.py": {
+      "sha256": "1004358e6d6c68fcc2134f9dd4cf3aaaf7ff26004231d490b51fc7cdcbb11361",
+      "size": 1685
     },
     "tests\\__init__.py": {
       "sha256": "5d136e35f96a3c342ea5f8663d3a688e580fc87e4693498b29d57d71d7994cf5",
@@ -1894,6 +1514,10 @@
       "sha256": "b9ea444e28681ca0807b0ad344db81bc57130de44c9f09e474e2c23b096a7251",
       "size": 15786
     },
+    "tests\\api\\test_refresh_rotation.py": {
+      "sha256": "69d251b077601a2c0ec83b7339cb76a1bec511adf72e906cd319064695d269f0",
+      "size": 8249
+    },
     "tests\\api\\test_team_members.py": {
       "sha256": "acbe212823d8c5f94641ffa4931b137f98d768d876b6c9af51d2d0826d4f5ae3",
       "size": 12232
@@ -1935,16 +1559,16 @@
       "size": 6203
     },
     "tests\\conftest.py": {
-      "sha256": "697ef49e72401514408189bf739478d483130804fd009d547765cbff4f90da33",
-      "size": 11001
+      "sha256": "754c863e2fcc916b4eba670ddd721d6fd105203f14b67c05bdb60d5c2a1c56fe",
+      "size": 12921
     },
     "tests\\core\\__init__.py": {
       "sha256": "80a33323d3dff8db69c41a48252a2b1d5c5fdc729b16deb86b09185226bcf30d",
       "size": 14
     },
     "tests\\core\\test_auth.py": {
-      "sha256": "2a2e30967cf751e51e69bd9f1cafcd97e3417ecbb1f9b2dfbe2d9419099ce53e",
-      "size": 6702
+      "sha256": "7d5c7cc40697247f1559de11070b80feda0e30c20dd9a70ece867b7882251c29",
+      "size": 6946
     },
     "tests\\core\\test_db.py": {
       "sha256": "c0faa815362913ca1edec660dd1af2c44e9e70ec0560c4d40b70ee05cdea9251",
@@ -1994,6 +1618,10 @@
       "sha256": "8cc0662a4057cca129b2f887d842d565d4e02e54d9e03bb669afe514ad7da79e",
       "size": 6242
     },
+    "tests\\integration\\test_openapi_contract.py": {
+      "sha256": "858adca98c3db7c35fdef3e27131d20968607344dee51793eca367f22d3ce72a",
+      "size": 5810
+    },
     "tests\\integration\\test_persons.py": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "size": 0
@@ -2009,6 +1637,22 @@
     "tests\\integration\\test_training_closure_validation.py": {
       "sha256": "1c806bf6fd02921b658104b51343a5506ff1258ac39e7b581eb16eed33da635f",
       "size": 8985
+    },
+    "tests\\invariants\\__init__.py": {
+      "sha256": "69b1ada9139e26b9ff2d5892384b236f3a510f28f9ef173f1750872072c5a149",
+      "size": 70
+    },
+    "tests\\invariants\\test_inv_auth_001_cookie_precedence.py": {
+      "sha256": "ab5adff181eca1d268d1a71a8232091f8223db130dff185ac43867c35c79d7ed",
+      "size": 2380
+    },
+    "tests\\invariants\\test_inv_auth_002_csrf_required_mutations.py": {
+      "sha256": "d4b3c97ddbe74e27da91ab90095b2406a02b02c4a029bc58365b85d191ef37de",
+      "size": 3042
+    },
+    "tests\\invariants\\test_inv_auth_003_bearer_mutation_deprecation.py": {
+      "sha256": "897e1d5ad97963e6cbd366f3896b694767d744a13e32b2b01ab5221455321eec",
+      "size": 3881
     },
     "tests\\memberships\\__init__.py": {
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -2150,9 +1794,37 @@
       "sha256": "3ea2bc5f526a05484bd04cabdd37dda4f21f88c0bc66ac66f61a41d7c634ae1d",
       "size": 1841
     },
+    "tests\\test_api_exercises.py": {
+      "sha256": "b9faefe81ab0707cc209b37e5a10d10a6a2849d247bd6a6ace657f4086a53cc3",
+      "size": 1171
+    },
+    "tests\\test_api_routes.py": {
+      "sha256": "550f7b5caf64523ba86f8be9934f74d6f99d1c8366e53fe4d8ccdc5d7baedfa8",
+      "size": 527
+    },
     "tests\\test_ficha_unica_obrigatorios.py": {
       "sha256": "aa5a32aeb6bd75ea95473c0f5ec6f6ddb7be966fcde6c2855d755b8dca6ebc8e",
       "size": 39053
+    },
+    "tests\\test_login_superadmin.py": {
+      "sha256": "c04ad84bd10d7e0684f146d991de47e4178418a01f393ca1a2e2530e361038eb",
+      "size": 1104
+    },
+    "tests\\test_main_simulation.py": {
+      "sha256": "f7850f360c636e3099725dcae376c016a5e6f5ca04aa81e98caca68652dbfd4b",
+      "size": 1048
+    },
+    "tests\\test_migration_hash.py": {
+      "sha256": "dcdf9327fd8cba9d473ecb6fae84eb723a466581488f8ae6d6dd272d8cf21738",
+      "size": 1570
+    },
+    "tests\\test_pwd.py": {
+      "sha256": "f851b5ce1eba435300881934efb191f9467e0a03007f15e53e95defab169e589",
+      "size": 276
+    },
+    "tests\\test_router.py": {
+      "sha256": "245d6e01f56f555441aa3407b46e207505ebc7c9ba398b25324b4dd20e97e342",
+      "size": 207
     },
     "tests\\test_training_crud_e2e.py": {
       "sha256": "7e4759b71a671a0962ccca42b97174e1e560701b0c0c35127bf5dfdd80eca12b",
@@ -2403,12 +2075,12 @@
       "size": 4568
     },
     "tests\\unit\\test_model_requirements_model_ast_parser.py": {
-      "sha256": "d5d2644389379fde256e4b9d86c23952c8a348a977d1e55b79ee5cbc155113a8",
-      "size": 2133
+      "sha256": "1100203880c1efe04ff733ef965b582da0b3d6b58c71d636902003e077105745",
+      "size": 2580
     },
     "tests\\unit\\test_model_requirements_schema_parser.py": {
-      "sha256": "3d06877f185fe48b11deebdb7ca116d1469c1f8c9a5f9215290a32e6f9663470",
-      "size": 2696
+      "sha256": "fa32eb33e7ed05eb5c603860b7472b661eeede157245c75ecef996288e8853d7",
+      "size": 3129
     },
     "tests\\unit\\test_schemas_base.py": {
       "sha256": "113edc6f8a94dcfdaad32a0db2dbe1457de7cb498167b22e72c6f60d2e2e38fe",
@@ -2441,34 +2113,6 @@
     "tests\\users\\test_user_service.py": {
       "sha256": "2bf25dbb84adf74cbf1531ff090c9d3a828b9bdf429dd60fa4ce9855295e91dc",
       "size": 2317
-    },
-    "tmp_batch_loop.ps1": {
-      "sha256": "763ce304b8239f8342cd0afed53a29b367d9873541ac9f9993ffb3132be23744",
-      "size": 4389
-    },
-    "tmp_check_parity.ps1": {
-      "sha256": "f76b993dfd300ab940d66f33be170b804dc0bc1ce3c503a15c1c23eea2f73c43",
-      "size": 739
-    },
-    "tmp_test_gate_season.ps1": {
-      "sha256": "6eaa93748a81a1ca8b740bf1c3a0820405e19bbe054c4c6cefb16e426c2282d5",
-      "size": 452
-    },
-    "tmp_test_idem.ps1": {
-      "sha256": "783768ebfc66c6abede5a4d4770d64b55dee8f180c5b503829b68cda4c779a50",
-      "size": 1284
-    },
-    "validate_and_fix_hash.py": {
-      "sha256": "47968c9fe425c1474ed3b1d3c8bc7aa1704e037e36d83774a3ea5ec09b95153b",
-      "size": 1552
-    },
-    "validate_implementation.py": {
-      "sha256": "fb0fc7ba7f242b67209726793b4651ef2723a0600d89299cdfe897f6cac816a9",
-      "size": 5253
-    },
-    "verify_coordenador_team.py": {
-      "sha256": "75c5017b3f741578a9dd7117dfe75d91836c3958f50795d5dc4e73def08e8325",
-      "size": 2497
     }
   },
   "root": "C:\\HB TRACK\\Hb Track - Backend"

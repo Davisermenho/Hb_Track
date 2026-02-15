@@ -1,0 +1,210 @@
+name: Scripts Policy Governance
+
+on:
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "scripts/_policy/**"
+      - "docs/_canon/_agent/SCRIPTS_classification.md"
+      - ".github/workflows/scripts-policy.yml"
+  push:
+    branches:
+      - main
+      - develop
+      - dev-changes  # TEMPORARY: validação pré-merge, remover após merge
+    paths:
+      - "scripts/**"
+      - "scripts/_policy/**"
+      - "docs/_canon/_agent/SCRIPTS_classification.md"
+      - ".github/workflows/scripts-policy.yml"
+  workflow_dispatch:
+
+jobs:
+  policy-check-windows:
+    name: Policy Gates (Windows)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/_policy/requirements.txt
+
+      - name: Validate path constants consistency
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          Write-Host "[CONSISTENCY_CHECK] Validating canonical path constants..." -ForegroundColor Cyan
+
+          $PythonPaths = & python scripts/_policy/check_path_constants.py | ConvertFrom-Json
+
+          $PSPaths = @{
+            SSOT_YAML_RELPATH      = "scripts/_policy/scripts.policy.yaml"
+            DERIVED_MD_RELPATH     = "docs/_canon/_agent/SCRIPTS_classification.md"
+            MANIFEST_JSON_RELPATH  = "scripts/_policy/policy.manifest.json"
+            HEURISTICS_YAML_RELPATH= "scripts/_policy/side_effects_heuristics.yaml"
+          }
+
+          $Mismatches = @()
+          foreach ($Key in $PSPaths.Keys) {
+            $PyValue = ($PythonPaths.$Key -replace '\\', '/')
+            $PSValue = ($PSPaths[$Key] -replace '\\', '/')
+            if ($PyValue -ne $PSValue) {
+              $Mismatches += "$Key : Python='$PyValue' vs PowerShell='$PSValue'"
+            }
+          }
+
+          if ($Mismatches.Count -gt 0) {
+            Write-Host "[HARNESS_ERROR] Path constants mismatch between Python and PowerShell:" -ForegroundColor Red
+            $Mismatches | ForEach-Object { Write-Host " $_" -ForegroundColor Red }
+            exit 3
+          }
+
+          Write-Host "[OK] All path constants consistent across Python and PowerShell" -ForegroundColor Green
+
+      - name: Run check_scripts_policy.ps1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/checks/policy/check_scripts_policy.ps1 -Verbose
+
+      - name: Run check_policy_md_is_derived.ps1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/checks/policy/check_policy_md_is_derived.ps1 -Verbose
+
+      - name: Run check_policy_manifest.ps1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/checks/policy/check_policy_manifest.ps1 -Verbose
+
+  policy-check-ubuntu:
+    name: Policy Gates (Ubuntu - Path/Case Check)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/_policy/requirements.txt
+
+      - name: Install PowerShell
+        run: |
+          wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo apt-get install -y powershell
+
+      - name: Validate path constants consistency (no jq)
+        run: |
+          echo "[CONSISTENCY_CHECK] Validating canonical path constants..."
+          python - <<'PYPYTHON'
+          import sys
+
+          try:
+              sys.path.insert(0, 'scripts/_policy')
+              from policy_lib import (
+                  SSOT_YAML_RELPATH,
+                  DERIVED_MD_RELPATH,
+                  MANIFEST_JSON_RELPATH,
+                  HEURISTICS_YAML_RELPATH,
+              )
+          except Exception as e:
+              print(f"[HARNESS_ERROR] Failed to import policy_lib: {e}")
+              raise SystemExit(3)
+
+          expected = {
+              "SSOT_YAML_RELPATH": "scripts/_policy/scripts.policy.yaml",
+              "DERIVED_MD_RELPATH": "docs/_canon/_agent/SCRIPTS_classification.md",
+              "MANIFEST_JSON_RELPATH": "scripts/_policy/policy.manifest.json",
+              "HEURISTICS_YAML_RELPATH": "scripts/_policy/side_effects_heuristics.yaml",
+          }
+          actual = {
+              "SSOT_YAML_RELPATH": SSOT_YAML_RELPATH,
+              "DERIVED_MD_RELPATH": DERIVED_MD_RELPATH,
+              "MANIFEST_JSON_RELPATH": MANIFEST_JSON_RELPATH,
+              "HEURISTICS_YAML_RELPATH": HEURISTICS_YAML_RELPATH,
+          }
+
+          mismatches = []
+          for k, exp in expected.items():
+              act = actual[k].replace("\\", "/")
+              expn = exp.replace("\\", "/")
+              if act != expn:
+                  mismatches.append(f"{k}: actual='{act}' vs expected='{expn}'")
+
+          if mismatches:
+              print("[HARNESS_ERROR] Path constants mismatch:")
+              for m in mismatches:
+                  print(f" {m}")
+              raise SystemExit(3)
+
+          print("[OK] All path constants consistent")
+          PYPYTHON
+
+      - name: Run check_scripts_policy.ps1 (via pwsh)
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/checks/policy/check_scripts_policy.ps1 -Verbose
+
+      - name: Run check_policy_md_is_derived.ps1 (via pwsh)
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/checks/policy/check_policy_md_is_derived.ps1 -Verbose
+
+      - name: Verify no typo vestiges (SCRIPTS_clasification.md)
+        run: |
+          if git ls-files | grep -i "SCRIPTS_clasification\.md"; then
+            echo "[ERROR] Typo vestige detected: SCRIPTS_clasification.md (old filename)"
+            echo "Must use: SCRIPTS_classification.md (corrected)"
+            exit 2
+          fi
+          echo "[OK] No typo vestiges found"
+
+      - name: Verify canonical path/case (git ls-files)
+        run: |
+          if ! git ls-files | grep -x "docs/_canon/_agent/SCRIPTS_classification.md"; then
+            echo "[ERROR] DERIVED file path/case mismatch or missing"
+            echo "Expected: docs/_canon/_agent/SCRIPTS_classification.md"
+            echo "Actual files:"
+            git ls-files | grep -i "scripts_class" || true
+            exit 2
+          fi
+          echo "[OK] DERIVED file path/case is canonical"
+
+  policy-summary:
+    name: Policy Check Summary
+    runs-on: ubuntu-latest
+    needs: [policy-check-windows, policy-check-ubuntu]
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          if [ "${{ needs.policy-check-windows.result }}" != "success" ]; then
+            echo "❌ Windows policy check failed"
+            exit 1
+          fi
+          if [ "${{ needs.policy-check-ubuntu.result }}" != "success" ]; then
+            echo "❌ Ubuntu policy check failed"
+            exit 1
+          fi
+          echo "✅ All policy checks passed"

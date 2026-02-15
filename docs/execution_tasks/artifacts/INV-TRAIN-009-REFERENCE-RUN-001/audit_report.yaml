@@ -1,0 +1,55 @@
+ARCH_AUDIT_RESULT:
+  task_id: "INV-TRAIN-009-REFERENCE-RUN-001"
+  audit_version: "v1.1.0"
+  final_state: "PASS_WITH_EVIDENCE_GAPS_NOTED"
+  closure:
+    status: "CLOSED"
+    timestamp_end_utc: "2026-02-13T12:15:00Z"
+
+  evidence_review:
+    E1_event_json:
+      status: "PARTIAL"
+      gap:
+        - "Path canônico não explicitado (esperado: docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/event.json)."
+    E2_run_log:
+      status: "PASS"
+      exit_code: 0
+      summary: "0 errors, 0 warnings"
+      status: "PASS"
+      note: "fornecido tail; suficiente para gate"
+    E3_rerun_log:
+      status: "PASS"
+      exit_code: 0
+      summary: "0 errors, 0 warnings"
+      status: "PASS"
+    E4_command_txt:
+      status: "PASS"
+      command_is_replayable: true
+    E5_auditor_log:
+      status: "PASS"
+      auditor_exit_code: 0
+    E6_git_clean:
+      status: "PASS_WITH_GAP"
+      gap:
+        - "git_state.txt não foi colado (apenas descrito)."
+
+  acceptance_gates:
+    A1_EVENT_JSON_PRESENT: "PASS_WITH_PATH_GAP"
+    A2_RUN_LOG_CAPTURED: "PASS"
+    A3_PASS_EXIT_0: "PASS"
+    A4_COMMAND_REPRODUCIBLE: "PASS"
+    A5_LOGS_COMPLIANCE_LOCK: "PASS"
+    A6_CLEAN_WORKSPACE: "PASS (current outputs declared empty)"
+
+  governance_gaps_register:
+    - gap_id: "GAP-INVT009-PATH-001"
+      description: "event.json colado sem path canônico explícito."
+      disposition: "NON-BLOCKING"
+    - gap_id: "GAP-INVT009-GITSTATE-001"
+      description: "git_state.txt não foi apresentado textualmente."
+      disposition: "NON-BLOCKING"
+
+  baseline:
+    invariant_id: "INV-TRAIN-009"
+    baseline_state: "GOLD"
+    canonical_command: "& C:\\HB TRACK\\Hb Track - Backend\\venv\\Scripts\\python.exe docs\\scripts\\verify_invariants_tests.py --inv INV-TRAIN-009"

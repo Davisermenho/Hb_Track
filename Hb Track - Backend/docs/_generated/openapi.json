@@ -469,8 +469,8 @@
         "tags": [
           "Authentication"
         ],
-        "summary": "Logout - Remove cookie HttpOnly",
-        "description": "Endpoint de logout que remove o cookie HttpOnly contendo o token.\n\n**Nota:** Em uma implementação completa, este endpoint invalidaria o token em uma blacklist.",
+        "summary": "Logout - Revoga Refresh Token",
+        "description": "Endpoint de logout que remove o cookie HttpOnly e revoga o Refresh Token no banco de dados.",
         "operationId": "logout_api_v1_auth_logout_post",
         "security": [
           {
@@ -511,6 +511,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RefreshTokenRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Payload"
+              }
+            }
+          }
+        },
         "responses": {
           "204": {
             "description": "Successful Response"
@@ -534,7 +551,7 @@
           "Authentication"
         ],
         "summary": "Renovar access token",
-        "description": "Renova o access token usando um refresh token válido.\n\n**Fluxo:**\n1. Cliente envia refresh_token (recebido no login)\n2. Backend valida o refresh_token\n3. Backend gera novo access_token e refresh_token\n4. Cliente atualiza tokens armazenados\n\n**Segurança:**\n- Refresh token válido por 7 dias\n- Access token válido por 30 minutos\n- Refresh token é invalidado e um novo é gerado (rotation)",
+        "description": "Renova o access token usando um refresh token válido.\n\n**Fase 2: Persistência e Rotação**\n1. Valida JWT assinado\n2. Valida hash no banco de dados\n3. Detecta reuso (se token revogado for usado, mata todas as sessões do usuário)\n4. Gera novos tokens e revoga o anterior",
         "operationId": "refresh_token_api_v1_auth_refresh_post",
         "requestBody": {
           "content": {
@@ -558,10 +575,7 @@
             }
           },
           "401": {
-            "description": "Refresh token inválido ou expirado"
-          },
-          "404": {
-            "description": "Usuário não encontrado"
+            "description": "Refresh token inválido, expirado ou revogado"
           },
           "422": {
             "description": "Validation Error",
@@ -570,6 +584,66 @@
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify-email": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Verificar email",
+        "description": "Stub para contrato (Phase 2).",
+        "operationId": "verify_email_api_v1_auth_verify_email_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/resend-verification": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Reenviar verificação",
+        "description": "Stub para contrato (Phase 2).",
+        "operationId": "resend_verification_api_v1_auth_resend_verification_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/roles": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Ver papéis",
+        "description": "Espelho de roles para o contrato (Phase 2).",
+        "operationId": "get_roles_api_v1_auth_roles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           }

@@ -1,0 +1,61 @@
+ARCH_AUDIT_RESULT:
+  task_id: "ARCH-GOV-STATUS-VOCAB-001"
+  audit_version: "v1.1.0"
+  final_state: "PASS"
+  closure:
+    status: "CLOSED"
+    timestamp_end_utc: "2026-02-13T13:15:00Z"
+
+  ssot:
+    canonical_event_json:
+      status: "PASS_WITH_PATH_GAP"
+      expected_path: "docs/execution_tasks/artifacts/ARCH-GOV-STATUS-VOCAB-001/event.json"
+      provided: "Path: event.json (content ok)"
+      content_valid: true
+
+  evidence_validation:
+    E1_event_json:
+      status: "PASS_WITH_PATH_GAP"
+      notes:
+        - "spec ok; status=PASS; scope=Governance"
+    E2_compactor_run:
+      status: "PASS"
+      exit_code: 0
+      events_total: 11
+      changed_files: []
+    E3_fix_inv_train_009_json:
+      status: "PASS_WITH_GAP"
+      gap:
+        - "Path canônico não explicitado (esperado: docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/event.json)."
+      validation: "trecho indica JSON agora fechado corretamente"
+    E4_status_vocab_changes:
+      status: "PASS_WITH_GAP"
+      gap:
+        - "Conteúdos integrais dos dois event.json não foram colados; apenas campos-chave."
+      effect_observed: "status=PASS e qualificador movido para notes_short"
+    E5_drift_log:
+      status: "PASS_WITH_PATH_GAP"
+      expected_path: "docs/ADR/architecture/GOVERNANCE_DRIFT_LOG.md"
+      provided: "Path: GOVERNANCE_DRIFT_LOG.md (snippet ok)"
+    E6_index_snapshot:
+      status: "PASS"
+      observed:
+        - "ARCH-GOV-STATUS-VOCAB-001, ARCH-AST-REG-001, INV-TRAIN-009-REFERENCE-RUN-001, ARCH-AST-001 agora com status PASS"
+        - "qualificador presente em notes_short no EXECUTIONLOG (ex: Audit: Gaps Noted)"
+    E7_git_gates:
+      status: "PASS_WITH_GAP"
+      gap:
+        - "git show --name-only / diff textual não colado; apenas stat summary"
+      clean_state: true
+
+  acceptance_gates:
+    E1_to_E7_received: "PASS"
+    compactor_exit_0: "PASS"
+    status_vocab_normalized: "PASS"
+    indexes_updated: "PASS"
+    workspace_clean: "PASS"
+
+  drift_register_update:
+    drift_id: "DRIFT-STATUS-VOCAB-001"
+    state: "RESOLVED"
+    resolution: "status field normalized to PASS/FAIL/DRIFT; qualifiers moved to notes_short; indexer unblocked"

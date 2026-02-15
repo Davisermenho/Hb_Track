@@ -1,5 +1,10 @@
 # GUARDRAIL_POLICY_REQUIREMENTS.md
 
+> **Parent:** [`GUARDRAILS_INDEX.md`](GUARDRAILS_INDEX.md) (Entry point único para todos os guardrails)  
+> **Domain:** Requirements Policy (profiles: strict/fk/lenient)  
+> **Version:** 1.0.0  
+> **Last Updated:** 2026-02-13
+
 ## Descrição
 Guardrail para requirements validation: quais validações são obrigatórias (strict), quais são permissivas, recovery paths.
 

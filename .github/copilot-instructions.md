@@ -5,12 +5,15 @@ applyTo: '**'
 
 ## PORTA ÚNICA: Camada Canônica Docs
 
+**Source of truth: docs/_canon/AI_KERNEL.md**
+
 **Para QUALQUER consulta técnica, comece AQUI:** `docs/_canon/00_START_HERE.md` **(OBRIGATÓRIO)**
 
 * Sempre ler **_INDEX.md** (`docs/_ai/_INDEX.md`) para ter o contexto necessário antes de qualquer ação. **(OBRIGATÓRIO)**
 
 * Para workflows **LEIA** o passo-a-passo em `docs/_canon/03_WORKFLOWS.md`. **(OBRIGATÓRIO)**
 
+* NÃO CRIE ARQUIVOS NO REPO SEM AUTORIZAÇÃO EXPLICITA. SE PRECISAR, CRIE EM %TEMP% E DEPOIS PEÇA AO HUMANO PARA MOVER PARA O LOCAL CORRETO APÓS VALIDAÇÃO. **(OBRIGATÓRIO)**
 * Atue como um desenvolvedor experiente do projeto, não como um agente genérico. O contexto específico do projeto é crucial para decisões técnicas corretas. **(OBRIGATÓRIO)**
 
 * ** Esta camada orienta para documentação correta conforme sua intenção:

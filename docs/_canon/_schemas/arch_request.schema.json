@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "required": ["task_id", "version", "context", "objectives", "ssot", "delta_structural", "gates"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "version": { "type": "string", "pattern": "^v\\d+\\.\\d+\\.\\d+$" },
+    "context": { "type": "string" },
+    "objectives": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "ssot": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "delta_structural": { "type": "string" },
+    "gates": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "ARCH-GOV-INFRA-001",
+  "timestamp_start": "2026-02-13T11:10:00Z",
+  "timestamp_end": "2026-02-13T11:15:00Z",
+  "status": "PASS",
+  "short_title": "Infra governance helpers (.github/_ia)",
+  "scope": "Infra",
+  "artifacts": [
+    ".github/**",
+    "docs/scripts/_ia/**"
+  ],
+  "notes_short": "Atualização de instruções de Copilot e scripts auxiliares de IA."
+}

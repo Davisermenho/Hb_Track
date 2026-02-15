@@ -4,7 +4,7 @@ on:
   pull_request:
     paths:
       - 'docs/**'
-      - 'scripts/_ia/**'
+      - 'docs/scripts/_ia/**'
       - '.github/workflows/**'
 
 jobs:
@@ -22,45 +22,66 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install -r scripts/_ia/requirements.txt
+          pip install -r docs/scripts/_ia/requirements.txt
       
       - name: Run quality gates extractor
         run: |
-          python scripts/_ia/extractors/extract-quality-gates.py \
+          python docs/scripts/_ia/extractors/extract-quality-gates.py \
             --output docs/_ai/_specs/quality-gates.yml \
             --allow-fallback
       
       - name: Validate schema
         run: |
-          python scripts/_ia/validators/validate-quality-gates-schema.py
+          python docs/scripts/_ia/validators/validate-quality-gates-schema.py
       
       - name: Run approved commands validator
         continue-on-error: true
         run: |
-          python scripts/_ia/validators/validate-approved-commands.py
+          python docs/scripts/_ia/validators/validate-approved-commands.py
+
+      - name: Validate ARCH_REQUEST Protocol Compliance
+        continue-on-error: true
+        run: |
+          python docs/scripts/_ia/lint_arch_request.py \
+            --glob "docs/_canon/_arch_requests/*.md" \
+            --profile compat \
+            --skip-non-arch
+
+      - name: Run AI Governance Linter
+        run: |
+          python docs/scripts/_ia/ai_governance_linter.py
+
+      - name: Validate SSOT Root Map Policy
+        run: |
+          python docs/scripts/validate-ssot-roots.py --config docs/_canon/PATHS_SSOT.yaml
+      
+      - name: Detect Agent Drift (Non-blocking)
+        continue-on-error: true
+        run: |
+          python docs/scripts/_ia/validators/agent_drift_detector.py
 
       - name: Run quality gates validator (optional)
         continue-on-error: true
         run: |
-          python scripts/_ia/validators/validate-quality-gates.py
+          python docs/scripts/_ia/validators/validate-quality-gates.py
 
       - name: Run all extractors (smoke tests)
         continue-on-error: true
         run: |
-          python scripts/_ia/extractors/extract-approved-commands.py
-          python scripts/_ia/extractors/extract-troubleshooting.py
+          python docs/scripts/_ia/extractors/extract-approved-commands.py
+          python docs/scripts/_ia/extractors/extract-troubleshooting.py
 
       - name: Run all generators
         continue-on-error: true
         run: |
-          python scripts/_ia/generators/generate-handshake-template.py
-          python scripts/_ia/generators/generate-invocation-examples.py
-          python scripts/_ia/generators/generate-checklist-yml.py
+          python docs/scripts/_ia/generators/generate-handshake-template.py
+          python docs/scripts/_ia/generators/generate-invocation-examples.py
+          python docs/scripts/_ia/generators/generate-checklist-yml.py
 
       - name: Upload validation logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: validation-logs
-          path: scripts/_ia/logs/
+          path: docs/scripts/_ia/logs/
           retention-days: 7

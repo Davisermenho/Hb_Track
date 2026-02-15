@@ -1,0 +1,16 @@
+{
+  "task_id": "ARCH-LOGS-001",
+  "timestamp_start": "2026-02-13T11:00:00Z",
+  "timestamp_end": "2026-02-13T11:05:00Z",
+  "status": "PASS",
+  "short_title": "EXECUTION LOG/CHANGELOG compaction + artifacts SSOT",
+  "scope": "Docs",
+  "artifacts": [
+    "scripts/compact_exec_logs.py",
+    "docs/ADR/architecture/CHANGELOG.md",
+    "docs/ADR/workflows/EXECUTIONLOG.md",
+    "docs/execution_tasks/_archive/CHANGELOG.md",
+    "docs/execution_tasks/_archive/EXECUTIONLOG.md"
+  ],
+  "notes_short": "Indices compacted via event.json; retention=150; overflow archived."
+}

@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": ["task_id", "phase", "commands", "gates"],
+  "properties": {
+    "task_id": { "type": "string" },
+    "phase": { "type": "string" },
+    "commands": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["gate_name", "exit_code", "status"],
+        "properties": {
+          "gate_name": { "type": "string" },
+          "exit_code": { "type": "integer" },
+          "status": { "enum": ["PASS", "FAIL"] }
+        }
+      }
+    }
+  }
+}

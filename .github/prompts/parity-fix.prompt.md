@@ -35,7 +35,7 @@ Objetivo: reduzir divergências estruturais Model↔DB com base em evidência do
 
 4) **Proponha o patch mínimo** (1 tabela por vez), mantendo precedência/SSOT do projeto
 
-5) **Defina o comando exato para revalidar** (use apenas comandos aprovados em [APPROVED_COMMANDS](C:/HB TRACK/docs/_canon/08_APPROVED_COMMANDS.md)). Inclua o output esperado (ex.: `structural_count` diminui)
+5) **Defina o comando exato para revalidar** (use apenas comandos aprovados em [APPROVED_COMMANDS](../../docs/_canon/08_APPROVED_COMMANDS.md)). Inclua o output esperado (ex.: `structural_count` diminui)
 
 ## Entrega
 

@@ -509,7 +509,7 @@ git commit -m "fix(models): correct teams/seasons FK types via autogen"
 
 | Componente | Tecnologia | Versão | Justificativa |
 |------------|------------|--------|---------------|
-| **Orquestrador** | PowerShell | 5.1+ | Nativo Windows, ideal para scripts de CI local |
+| **Orquestrador** | PowerShell | 5.1+ | Nativo Windows, adequado para scripts de CI local |
 | **SSOT Generator** | pg_dump | 14.x | Geração determinística de schema via `inv.ps1 refresh` |
 | **Parser DDL** | Python regex | 3.11+ | Parsing de CREATE TABLE em `model_requirements.py` |
 | **Parser AST** | Python ast | stdlib | Parsing de models Python (Mapped, Column, __table_args__) |

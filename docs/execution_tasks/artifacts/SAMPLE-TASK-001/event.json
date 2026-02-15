@@ -1,0 +1,14 @@
+{
+  "task_id": "SAMPLE-TASK-001",
+  "status": "PASS",
+  "scope": "documentation",
+  "short_title": "Template sample task for demonstration purposes",
+  "notes_short": "Example task structure for artifacts directory",
+  "timestamp_start": "2026-02-13T12:00:00Z",
+  "timestamp_end": "2026-02-13T12:30:00Z",
+  "git_commit": "a1b2c3d",
+  "artifacts": [
+    "docs/execution_tasks/artifacts/SAMPLE-TASK-001/summary.json",
+    "docs/execution_tasks/artifacts/SAMPLE-TASK-001/evidence_index.md"
+  ]
+}

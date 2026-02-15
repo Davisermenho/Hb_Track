@@ -1,0 +1,8 @@
+Command executed:
+& 'C:\HB TRACK\scripts\_policy\check_scripts_policy.ps1'
+
+Working directory:
+C:\HB TRACK
+
+Executed at (UTC):
+2026-02-15 03:20:27

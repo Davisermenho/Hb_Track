@@ -1,0 +1,13 @@
+[check_python_layout] Validating Python file layout...
+[check_python_layout] Validating Python file layout...
+POLICY_PATH=scripts/_policy/python_layout.policy.yaml
+POLICY_SHA256=39221c596a3715d5ac269b56c96126e543f7366d020868382466c3ebe0521299
+ROOTS_SHA256=0b313e48fbef3ff6d73e96149dd592ba6da908534a89d89966e2df581d01bdc2
+MODE=report_only
+IGNORE_GLOBS_COUNT=1
+ALLOWED_ROOTS_COUNT=12
+SCANNED_COUNT=575
+VIOLATIONS_COUNT=0
+[OK] All .py files in allowed roots
+
+[OK] Python layout check completed (exit 0)

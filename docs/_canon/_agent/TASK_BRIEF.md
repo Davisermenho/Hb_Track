@@ -75,7 +75,21 @@ O que fazer se tudo der errado.
 
 ---
 
-# 8. ARCHITECT AUTHORIZATION
+# 8. TEST PLAN (OBRIGATÓRIO)
+
+**TEST_PLAN**:
+  1. TEST_FILES_REQUIRED: lista exata
+  2. TEST_COMMANDS: comandos exatos
+  3. MIN_ASSERTS: bullet com 3–5 asserts que precisam existir
+**ACCEPTANCE**:
+   pytest exit 0
+   collected > 0
+**EVIDENCE_PACK**:
+   pytest_output.txt
+
+---
+
+# 9. ARCHITECT AUTHORIZATION
 
 "Checklist validado. Determinism Score: X/5. Task apta para execução."
 

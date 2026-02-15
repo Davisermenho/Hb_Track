@@ -76,11 +76,11 @@ docs/_ai/
    - Docs AI (`docs/_ai/`) são compactos, parseáveis, validáveis.
 
 2. **SSOT derivado:**  
-   - Arquivos AI são **gerados automaticamente** a partir da documentação canônica via scripts (`scripts/_ia/extractors/`).
+   - Arquivos AI são **gerados automaticamente** a partir da documentação canônica via scripts (`docs/scripts/_ia/extractors/`).
    - Desenvolvedores editam apenas SSOT canônico; CI regenera AI docs e falha se houver drift.
 
 3. **Validação obrigatória (CI):**  
-   - Todo PR executa validadores (`scripts/_ia/validators/`) que checam:
+   - Todo PR executa validadores (`docs/scripts/_ia/validators/`) que checam:
      - Sincronização SSOT ↔ AI docs
      - Schemas válidos (agent-spec, quality-gates)
      - Código respeita thresholds (radon, lizard)
@@ -121,7 +121,7 @@ Se decidirmos mudar complexidade ciclomática de 6 → 8, precisamos:
 
 **Solução com ADR:**  
 1. Editar `docs/_canon/QUALITY_METRICS.md` (SSOT).
-2. Executar `python scripts/_ia/extractors/extract-quality-gates.py`.
+2. Executar `python docs/scripts/_ia/extractors/extract-quality-gates.py`.
 3. CI valida `quality-gates.yml` contra schema.
 4. Scripts de validação leem `quality-gates.yml` automaticamente.
 5. ADR documenta **por quê** mudamos de 6 → 8 (contexto histórico).
@@ -237,7 +237,7 @@ Rejeição:
 Vendor lock-in (dependência de serviço externo).
 Thresholds ficam em UI, não versionados com código.
 Dificulta agents locais/offline lerem regras.
-Nota: Podemos integrar SonarQube além desta estrutura (importar quality-gates.yml para Sonar).
+Nota: É possível integrar SonarQube além desta estrutura (importar quality-gates.yml para Sonar).
 
 Alternativa 4: Misturar docs humanas e AI na mesma pasta
 Rejeição:
@@ -249,7 +249,7 @@ Agentes gastam tokens lendo prosa longa; humanos se perdem em YAMLs técnicos.
 ### Fase 1: Setup estrutura (P0 — Sprint atual)
 
 - [ ] Criar `docs/_ai/` com subpastas (`_context`, `_specs`, `_schemas`, `_prompts`, `_maps`, `_guardrails`, `_checklists`)
-- [ ] Criar `scripts/_ia/` com subpastas (`extractors`, `validators`, `generators`, `agents`, `utils`)
+- [ ] Criar `docs/scripts/_ia/` com subpastas (`extractors`, `validators`, `generators`, `agents`, `utils`)
 - [ ] Criar arquivos P0:
 - [ ] `docs/_ai/_context/AI_CONTEXT.md`
 - [ ] `docs/_ai/_specs/quality-gates.yml`
@@ -261,10 +261,10 @@ Agentes gastam tokens lendo prosa longa; humanos se perdem em YAMLs técnicos.
 - [ ] `.aiprompt`
 
 ### Fase 2: Extractors e validadores (P1 — Próxima sprint)
-- [ ] `scripts/_ia/extractors/extract-quality-gates.py`
-- [ ] `scripts/_ia/extractors/extract-ai-context.py`
-- [ ] `scripts/_ia/validators/validate-ai-docs-sync.py`
-- [ ] `scripts/_ia/validators/validate-quality-gates.py`
+- [ ] `docs/scripts/_ia/extractors/extract-quality-gates.py`
+- [ ] `docs/scripts/_ia/extractors/extract-ai-context.py`
+- [ ] `docs/scripts/_ia/validators/validate-ai-docs-sync.py`
+- [ ] `docs/scripts/_ia/validators/validate-quality-gates.py`
 - [ ] `.github/workflows/ai-docs-validation.yml`
 - [ ] `.github/workflows/quality-gates.yml`
 
@@ -272,10 +272,10 @@ Agentes gastam tokens lendo prosa longa; humanos se perdem em YAMLs técnicos.
 - [ ] `docs/_ai/_specs/workflows.yml`
 - [ ] `docs/_ai/_checklists/checklist-models.yml`
 - [ ] `docs/_ai/_maps/adr-index.json`
-- [ ] `scripts/_ia/generators/generate-ai-index.py`
+- [ ] `docs/scripts/_ia/generators/generate-ai-index.py`
 
 ### Fase 4: Integração com agentes (P2 — Backlog)
-- [ ] `scripts/_ia/agents/code-review-agent.py`
+- [ ] `docs/scripts/_ia/agents/code-review-agent.py`
 - [ ] Testar Copilot Chat com `AI_CONTEXT.md` + `agent-spec.json`
 - [ ] Validar `quality-gates.yml` em PRs reais
 
@@ -291,7 +291,7 @@ Agentes gastam tokens lendo prosa longa; humanos se perdem em YAMLs técnicos.
 
 ### Processuais
 
-- [ ] Desenvolvedores conseguem rodar python `scripts/_ia/validators/validate-ai-docs-sync.py` localmente
+- [ ] Desenvolvedores conseguem rodar python `docs/scripts/_ia/validators/validate-ai-docs-sync.py` localmente
 - [ ] Documentação (docs/_ai/README.md) explica fluxo: editar SSOT → regenerar → validar
 - [ ] PRs incluem checklist: "Validei quality gates localmente" (via PR template)
 

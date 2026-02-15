@@ -11,10 +11,12 @@ Referências RAG:
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from types import SimpleNamespace
+import hashlib
+import hmac
 import bcrypt
 from jose import JWTError, jwt
 from app.core.config import settings
-from uuid import UUID
+from uuid import UUID, uuid4
 
 # Compat: passlib 1.7 expects bcrypt.__about__.__version__, which bcrypt 4.3 removed
 if not hasattr(bcrypt, "__about__"):
@@ -99,6 +101,23 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return encoded_jwt
 
 
+def hash_token(token: str) -> str:
+    """
+    Gera hash SHA-256 de um token para armazenamento seguro.
+    
+    Usado para Refresh Tokens (Fase 2).
+    """
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def verify_token_hash(token: str, token_hash: str) -> bool:
+    """
+    Verifica se um token corresponde ao hash armazenado.
+    """
+    current_hash = hashlib.sha256(token.encode()).hexdigest()
+    return hmac.compare_digest(current_hash, token_hash)
+
+
 def decode_access_token(token: str) -> dict:
     """
     Decodifica JWT
@@ -142,7 +161,8 @@ def create_refresh_token(user_id: str, expires_delta: Optional[timedelta] = None
     to_encode = {
         "sub": user_id,
         "type": "refresh",
-        "exp": expire
+        "exp": expire,
+        "jti": str(uuid4())
     }
     
     return jwt.encode(

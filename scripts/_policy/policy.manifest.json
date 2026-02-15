@@ -1,0 +1,11 @@
+{
+  "canonical_generator": "scripts/_policy/render_policy_md.py",
+  "generated_utc": "2026-02-15T07:53:32.596708Z",
+  "generator_version": "1.0.0",
+  "hashes": {
+    "SCRIPTS_classification.md": "0a0adfb1e45a1867930b9e549a746cebd33ffcbba3c7a3bbbf83031208053060",
+    "scripts.policy.yaml": "0dd31ce741ee9b1926c28c2b4263cd0d1a31b3cce4c167b0e64406b80bcfd8ef",
+    "side_effects_heuristics.yaml": "e531cc4ce05028889ad96fd838a70e37632685b7ca6fefb3c3e0ea47edec0753"
+  },
+  "schema_version": "1.0.0"
+}

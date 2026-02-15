@@ -1,0 +1,13 @@
+# Enforce LF for text files to avoid cross-platform drift in documentation gates
+* text=auto eol=lf
+
+# Explicitly mark canonical and artifact files
+*.json text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sql text eol=lf
+
+# Keep PowerShell as CRLF for Windows native execution
+*.ps1 text eol=crlf

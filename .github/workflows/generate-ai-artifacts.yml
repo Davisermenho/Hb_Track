@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install -r scripts/_ia/requirements.txt
+        run: pip install -r docs/scripts/_ia/requirements.txt
       - name: TODO - Generate AI artifacts from SSOT
         run: python .github/scripts/generate_ai_docs.py
         shell: bash

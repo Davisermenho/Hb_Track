@@ -1,5 +1,10 @@
 # AGENT_GUARDRAILS.md
 
+> **Parent:** [`../_guardrails/GUARDRAILS_INDEX.md`](../_guardrails/GUARDRAILS_INDEX.md) (Entry point único para todos os guardrails)  
+> **Domain:** Operational Guardrails (DevOps, Repository, Model Pipeline, Documentation)  
+> **Version:** 1.0.0  
+> **Last Updated:** 2026-02-13
+
 ## Descrição
 Guardrails operacionais: limites, proibições, e comportamentos fail-fast que protegem o agente contra estados inválidos.
 

@@ -1,64 +1,23 @@
-# Changelog - HB Track
-Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+# CHANGELOG
 
-O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Uma linha por TASK_ID (derivado de event.json).
 
-## [Unreleased]
-### Adicionado
-* **AI Governance Canonical Templates** (2026-02-12): Implementação da suite de governança e protocolos para agentes de IA:
-  - `AI_GOVERNANCE_INDEX.md`: Índice centralizador.
-  - `AI_INCIDENT_RESPONSE_POLICY.md`: Protocolo para falhas e alucinações.
-  - `AI_TASK_VERSIONING_POLICY.md`: Gestão de versões de tarefas.
-  - `AI_PROTOCOL_CHECKLIST.md`: Checklist de pré-emissão de tarefas.
-  - `AI_ARCH_EXEC_PROTOCOL.md`: Protocolo Architect vs Executor.
-  - `TASK_BRIEF.md` & `EVIDENCE_PACK.md`: Templates de input/output determinísticos.
-
-### Pendente CI/CD
-* GitHub Actions workflow para validar quality-gates e approved-commands em PRs (próximo passo)
-* Implementação de `generate-ai-index.py` (ainda é placeholder TODO)
-* Adicionar `validate-quality-gates-schema.py` como validador de schema
-
-### Adicionado
-* **AI Infrastructure Validation & Smoke Tests** (2026-02-12): Validação completa da infraestrutura de IA com testes locais e CI/CD:
-  - **Smoke Tests (7/7 PASS)**: Utils (json_loader, yaml_loader), Extractors (approved-commands, troubleshooting), Generators (handshake, invocation-examples, checklist)
-  - **Artefatos Gerados**:
-    - `docs/_ai/_context/approved-commands.yml` (5 categorias extraídas)
-    - `docs/_ai/_maps/troubleshooting-map.json` (4 exit codes mapeados)
-    - `docs/_ai/_specs/invocation-examples.yml` (exemplos de invocação)
-    - `docs/_ai/_specs/checklist-models.yml` (checklist de models)
-    - `.github/copilot-handshake.md` (protocolo de handshake)
-  - **Validadores (2/2 PASS)**: Quality gates (✅ passed, radon opcional), Approved commands (⚠️ requer whitelist update)
-  - **Code Review Pipeline**: `scripts/dev/run_code_review.sh` implementado com 13 steps (setup, testes, extratores, validadores, linters, métricas)
-  - **Exit Code Semantics**: 0=PASS, 1=CRITICAL_FAIL, 2=WARNING, 3=FATAL_ERROR (alinhado com canônico)
-
-* **AI Infrastructure: scripts/_ia/ + GitHub Actions Workflows** (2026-02-11): Construção completa de infraestrutura para automação e validação de agentes:
-  - **9 Arquivos Python Implementados** (substituindo placeholders, status: MERGED 2026-02-11):
-    - **Utilities (2)**: `scripts/_ia/utils/json_loader.py`, `scripts/_ia/utils/yaml_loader.py`
-    - **Extractors (2)**: `scripts/_ia/extractors/extract-approved-commands.py`, `scripts/_ia/extractors/extract-troubleshooting.py`
-    - **Validators (2)**: `scripts/_ia/validators/validate-approved-commands.py`, `scripts/_ia/validators/validate-quality-gates.py`
-    - **Generators (3)**: `scripts/_ia/generators/generate-handshake-template.py`, `scripts/_ia/generators/generate-invocation-examples.py`, `scripts/_ia/generators/generate-checklist-yml.py`
-  - **Implementações**:
-    - Error handling robusto (FileNotFoundError, JSONDecodeError, YAMLError)
-    - UTF-8 encoding explícito em todas as operações de arquivo
-    - Smoke tests básicos nas utilities
-    - Saída clara e exit codes (0=pass, 1=fail)
-    - Sem hardcoded credentials ou PII
-  - **Status:** Código implementado, PR foi fundido (merged). Próximo passo: criar workflows de CI/CD para validar e executar essas ferramentas automaticamente.
-
-### Alterado
-* `docs/_ai/` reorganizado anteriormente (2026-02-11) — agora com implementações executáveis em `scripts/_ia/` (utilities, extractors, validators, generators).
-
-### Removido
-* Placeholders antigos em `scripts/_ia/` substituídos por implementações funcionais.
-
----
-
-## [2026-02-11]
-### Adicionado
-* Implementação inicial de infraestrutura AI (scripts/_ia) e documentação de suporte.
-
----
-
-## Notas
-- CI/CD: adicionar GitHub Actions que executem `validate-quality-gates.py` e `validate-approved-commands.py` em PRs.
-- Segurança: instalar dependências listadas em `scripts/_ia/requirements.txt` em runners CI antes de executar radon/lizard.
+- 2026-02-14 | ARCH-SCRIPTS-REFACTOR-002 | PASS | Scripts | Refactor compact_exec_logs.py (idempotency + CLI + exit codes) | [ARCH-SCRIPTS-REFACTOR-002](docs/execution_tasks/artifacts/ARCH-SCRIPTS-REFACTOR-002/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-SCRIPTS-REFACTOR-001 | PASS | Scripts | Refactor fix_superadmin.py (idempotency + JSON logging + CLI) | [ARCH-SCRIPTS-REFACTOR-001](docs/execution_tasks/artifacts/ARCH-SCRIPTS-REFACTOR-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-BOOTSTRAP-SMOKE-001 | DRAFT | Governance | Smoke bootstrap | [ARCH-BOOTSTRAP-SMOKE-001](docs/execution_tasks/artifacts/ARCH-BOOTSTRAP-SMOKE-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-DOCS-ARTIFACTS-002-FOLLOWUP-DET | PASS | Governance | Fix Determinismo e Bug de Indentação (Follow-up) | [ARCH-DOCS-ARTIFACTS-002-FOLLOWUP-DET](docs/execution_tasks/artifacts/ARCH-DOCS-ARTIFACTS-002-FOLLOWUP-DET/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-DOCS-ARTIFACTS-002 | PASS | Governance | Execution Tasks Artifacts & Machine-Readable Indexing | [ARCH-DOCS-ARTIFACTS-002](docs/execution_tasks/artifacts/ARCH-DOCS-ARTIFACTS-002/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-GOV-STATUS-VOCAB-001 | PASS | Governance | Normalizar vocabulário de status (compactador + event.json) | [ARCH-GOV-STATUS-VOCAB-001](docs/execution_tasks/artifacts/ARCH-GOV-STATUS-VOCAB-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-AST-REG-001 | PASS | Tests | ASTAnalyzer regression tests (async parity lock) | [ARCH-AST-REG-001](docs/execution_tasks/artifacts/ARCH-AST-REG-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | SAMPLE-TASK-001 | PASS | documentation | Template sample task for demonstration purposes | [SAMPLE-TASK-001](docs/execution_tasks/artifacts/SAMPLE-TASK-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | INV-TRAIN-009-REFERENCE-RUN-001 | PASS | Tests | INV-TRAIN-009 reference run baseline | [INV-TRAIN-009-REFERENCE-RUN-001](docs/execution_tasks/artifacts/INV-TRAIN-009-REFERENCE-RUN-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-AST-001 | PASS | Tests | Refatoração ASTAnalyzer Async | [ARCH-AST-001](docs/execution_tasks/artifacts/ARCH-AST-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-GOV-AUDIT-LOGS-001 | PASS | Governance | Automated log compliance auditor (scripts/_ia) | [ARCH-GOV-AUDIT-LOGS-001](docs/execution_tasks/artifacts/ARCH-GOV-AUDIT-LOGS-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-LOGS-001-FOLLOWUP-SPLIT | PASS | Docs | Normalização de Governança e Particionamento de Escopo | [ARCH-LOGS-001-FOLLOWUP-SPLIT](docs/execution_tasks/artifacts/ARCH-LOGS-001-FOLLOWUP-SPLIT/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-GOV-SCHEMA-001 | PASS | Models | Schema/API artifacts update | [ARCH-GOV-SCHEMA-001](docs/execution_tasks/artifacts/ARCH-GOV-SCHEMA-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-GOV-INFRA-001 | PASS | Infra | Infra governance helpers (.github/_ia) | [ARCH-GOV-INFRA-001](docs/execution_tasks/artifacts/ARCH-GOV-INFRA-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-GOV-DBMIG-001 | PASS | Infra | DB migration state/artifacts | [ARCH-GOV-DBMIG-001](docs/execution_tasks/artifacts/ARCH-GOV-DBMIG-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-GOV-CANON-001 | PASS | Docs | Canon docs governance updates | [ARCH-GOV-CANON-001](docs/execution_tasks/artifacts/ARCH-GOV-CANON-001/HUMAN_SUMMARY.md)
+- 2026-02-13 | ARCH-LOGS-001 | PASS | Docs | EXECUTION LOG/CHANGELOG compaction + artifacts SSOT | [ARCH-LOGS-001](docs/execution_tasks/artifacts/ARCH-LOGS-001/HUMAN_SUMMARY.md)
+- UNKNOWN_DATE | ARCH-SCRIPTS-REFACTOR-004 | PASS | Unknown | AR-004 complete: seed_permissions refactored with full idempotency validation (GATE-A APPROVED), CLI standards, JSON lo… | [ARCH-SCRIPTS-REFACTOR-004](docs/execution_tasks/artifacts/ARCH-SCRIPTS-REFACTOR-004/HUMAN_SUMMARY.md)
+- UNKNOWN_DATE | ARCH-SCRIPTS-REFACTOR-003 | PASS | Unknown | seed_v1_2_initial.py refactored: idempotency via idempotency_keys table, CLI (--dry-run, --force, --help), JSON logging… | [ARCH-SCRIPTS-REFACTOR-003](docs/execution_tasks/artifacts/ARCH-SCRIPTS-REFACTOR-003/HUMAN_SUMMARY.md)

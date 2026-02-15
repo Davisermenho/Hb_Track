@@ -37,26 +37,26 @@
 | `docs/_ai/_docs_arch/DOCS_ARCH_MASTER.md` | Placeholder | Verificar |
 | `docs/_ai/.aiignore` | Existente | Verificar conteúdo |
 
-### Estrutura `scripts/_ia/` (criada, com placeholders)
+### Estrutura `docs/scripts/_ia/` (criada, com placeholders)
 
 | Path | Estado | Conteúdo Real? |
 |------|--------|----------------|
-| `scripts/_ia/README.md` | Existente | Documentação de interface (correcta) |
-| `scripts/_ia/requirements.txt` | Existente | Verificar dependências |
-| `scripts/_ia/extractors/extract-quality-gates.py` | Placeholder | `TODO: implement` (pass) |
-| `scripts/_ia/extractors/extract-ai-context.py` | Placeholder | Verificar |
-| `scripts/_ia/extractors/extract-workflows.py` | Placeholder | Verificar |
-| `scripts/_ia/extractors/extract-adr-index.py` | Placeholder | Verificar |
-| `scripts/_ia/extractors/extract-approved-commands.py` | Placeholder | Verificar |
-| `scripts/_ia/extractors/extract-troubleshooting.py` | Placeholder | Verificar |
-| `scripts/_ia/validators/validate-ai-docs-sync.py` | Placeholder | Verificar |
-| `scripts/_ia/validators/validate-quality-gates.py` | Placeholder | Verificar |
-| `scripts/_ia/validators/validate-agent-spec.py` | Placeholder | Verificar |
-| `scripts/_ia/validators/validate-approved-commands.py` | Placeholder | Verificar |
-| `scripts/_ia/validators/validate-yaml-json.py` | Placeholder | Verificar |
-| `scripts/_ia/generators/generate-*.py` (4) | Placeholder | Verificar |
-| `scripts/_ia/agents/*.py` (3) | Placeholder | Verificar |
-| `scripts/_ia/utils/*.py` (4) | Placeholder | Verificar |
+| `docs/scripts/_ia/README.md` | Existente | Documentação de interface (correcta) |
+| `docs/scripts/_ia/requirements.txt` | Existente | Verificar dependências |
+| `docs/scripts/_ia/extractors/extract-quality-gates.py` | Placeholder | `TODO: implement` (pass) |
+| `docs/scripts/_ia/extractors/extract-ai-context.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/extractors/extract-workflows.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/extractors/extract-adr-index.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/extractors/extract-approved-commands.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/extractors/extract-troubleshooting.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/validators/validate-ai-docs-sync.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/validators/validate-quality-gates.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/validators/validate-agent-spec.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/validators/validate-approved-commands.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/validators/validate-yaml-json.py` | Placeholder | Verificar |
+| `docs/scripts/_ia/generators/generate-*.py` (4) | Placeholder | Verificar |
+| `docs/scripts/_ia/agents/*.py` (3) | Placeholder | Verificar |
+| `docs/scripts/_ia/utils/*.py` (4) | Placeholder | Verificar |
 
 ### GitHub Workflows (criados, com TODO)
 
@@ -98,7 +98,7 @@ Auditar todos os placeholders, classificá-los como REAL/PLACEHOLDER/AUSENTE, e 
   - `AUSENTE` = ficheiro não existe
 - [ ] **AUDIT-02**: Registar resultado no inventário (actualizar esta secção)
 - [ ] **AUDIT-03**: Verificar existência de `.aiprompt` e `.github/.copilotignore` na raiz
-- [ ] **AUDIT-04**: Verificar conteúdo de `scripts/_ia/requirements.txt` (dependências: radon, lizard, pyyaml, jsonschema)
+- [ ] **AUDIT-04**: Verificar conteúdo de `docs/scripts/_ia/requirements.txt` (dependências: radon, lizard, pyyaml, jsonschema)
 
 ### 0.3 Critério de passagem
 
@@ -123,12 +123,12 @@ Test-Path .\docs\_canon\03_WORKFLOWS.md              # True
 Test-Path .\docs\_canon\08_APPROVED_COMMANDS.md      # True
 Test-Path .\scripts\_ia\requirements.txt             # True
 python --version                                      # >= 3.11
-pip install -r scripts/_ia/requirements.txt           # exit 0
+pip install -r docs/scripts/_ia/requirements.txt           # exit 0
 ```
 
 ### 1.2 Extractor: quality-gates (P0 — Prioridade máxima)
 
-**Ficheiro:** `scripts/_ia/extractors/extract-quality-gates.py`
+**Ficheiro:** `docs/scripts/_ia/extractors/extract-quality-gates.py`
 **Entrada SSOT:** `docs/_canon/QUALITY_METRICS.md`
 **Saída:** `docs/_ai/_specs/quality-gates.yml`
 
@@ -155,7 +155,7 @@ $LASTEXITCODE  # Esperado: 0
 
 ### 1.3 Extractor: ai-context (P0)
 
-**Ficheiro:** `scripts/_ia/extractors/extract-ai-context.py`
+**Ficheiro:** `docs/scripts/_ia/extractors/extract-ai-context.py`
 **Entrada SSOT:** `docs/_canon/00_START_HERE.md` + `docs/_canon/01_AUTHORITY_SSOT.md`
 **Saída:** `docs/_ai/_context/AI_CONTEXT.md`
 
@@ -166,7 +166,7 @@ $LASTEXITCODE  # Esperado: 0
 
 ### 1.4 Extractor: approved-commands (P0)
 
-**Ficheiro:** `scripts/_ia/extractors/extract-approved-commands.py`
+**Ficheiro:** `docs/scripts/_ia/extractors/extract-approved-commands.py`
 **Entrada SSOT:** `docs/_canon/08_APPROVED_COMMANDS.md`
 **Saída:** `docs/_ai/_specs/approved-commands.yml`
 
@@ -210,7 +210,7 @@ Implementar validação automática em CI que bloqueia PRs com drift SSOT ↔ AI
 
 ### 2.1 Validator: validate-quality-gates.py (P1)
 
-**Ficheiro:** `scripts/_ia/validators/validate-quality-gates.py`
+**Ficheiro:** `docs/scripts/_ia/validators/validate-quality-gates.py`
 
 **Requisitos obrigatórios:**
 - [ ] Ler thresholds de `docs/_ai/_specs/quality-gates.yml`
@@ -231,7 +231,7 @@ $LASTEXITCODE  # Esperado: 0
 
 ### 2.2 Validator: validate-ai-docs-sync.py (P1)
 
-**Ficheiro:** `scripts/_ia/validators/validate-ai-docs-sync.py`
+**Ficheiro:** `docs/scripts/_ia/validators/validate-ai-docs-sync.py`
 
 **Requisitos obrigatórios:**
 - [ ] Comparar timestamps: se doc SSOT (`docs/_canon/`) é mais recente que doc AI derivado (`docs/_ai/`), emitir warning
@@ -254,7 +254,7 @@ $LASTEXITCODE  # Esperado: 0
 
 ### 2.3 Validator: validate-agent-spec.py (P1)
 
-**Ficheiro:** `scripts/_ia/validators/validate-agent-spec.py`
+**Ficheiro:** `docs/scripts/_ia/validators/validate-agent-spec.py`
 
 **Requisitos:**
 - [ ] Validar `docs/_ai/_specs/agent-spec.json` contra `docs/_ai/_schemas/agent-spec.schema.json`
@@ -262,7 +262,7 @@ $LASTEXITCODE  # Esperado: 0
 
 ### 2.4 Validator: validate-approved-commands.py (P1)
 
-**Ficheiro:** `scripts/_ia/validators/validate-approved-commands.py`
+**Ficheiro:** `docs/scripts/_ia/validators/validate-approved-commands.py`
 
 **Requisitos:**
 - [ ] Ler `approved-commands.yml`
@@ -305,18 +305,18 @@ Completar o ecossistema com workflows machine-readable, checklists executáveis 
 
 ### 3.1 Extractor: workflows (P2)
 
-**Ficheiro:** `scripts/_ia/extractors/extract-workflows.py`
+**Ficheiro:** `docs/scripts/_ia/extractors/extract-workflows.py`
 **Entrada SSOT:** `docs/_canon/03_WORKFLOWS.md`
 **Saída:** `docs/_ai/_specs/workflows.yml`
 
 ### 3.2 Generator: adr-index (P2)
 
-**Ficheiro:** `scripts/_ia/generators/generate-ai-index.py`
+**Ficheiro:** `docs/scripts/_ia/generators/generate-ai-index.py`
 **Saída:** `docs/_ai/_maps/adr-index.json`
 
 ### 3.3 Generator: checklists (P2)
 
-**Ficheiro:** `scripts/_ia/generators/generate-checklist-yml.py`
+**Ficheiro:** `docs/scripts/_ia/generators/generate-checklist-yml.py`
 **Saída:** `docs/_ai/_checklists/checklist-models.yml`
 
 ### 3.4 Completar guardrails (P2)
@@ -350,7 +350,7 @@ Garantir que agentes (Copilot, Cursor, Cline, Claude) consomem os artefatos mach
 
 ### 4.3 Agent code-review (P2)
 
-**Ficheiro:** `scripts/_ia/agents/code-review-agent.py`
+**Ficheiro:** `docs/scripts/_ia/agents/code-review-agent.py`
 
 **Requisitos:**
 - [ ] Ler `quality-gates.yml` + `security-policy.yml`

@@ -1,0 +1,60 @@
+{
+  "event_id": "ARCH-SCRIPTS-GOV-001",
+  "task_id": "EXEC-TASK-ARCH-SCRIPTS-GOV-001",
+  "timestamp": "2026-02-15T01:00:00Z",
+  "status": "IN_PROGRESS_CI_VALIDATION",
+  "type": "SCRIPTS_GOVERNANCE",
+  "target": "scripts/_policy/",
+  "gates": {
+    "GATE-1_YAML_SYNTAX": "PASS",
+    "GATE-2_PATH_CONSISTENCY": "PASS",
+    "GATE-3_ANTI_DRIFT": "PASS",
+    "GATE-4_MANIFEST_HASHES": "PASS",
+    "GATE-5_CI_WINDOWS": "PENDING",
+    "GATE-6_CI_UBUNTU": "PENDING"
+  },
+  "validation": {
+    "pre_merge_tests": "4/4_PASS",
+    "drift_detection": "PASS_EXIT_2_CONFIRMED",
+    "yaml_parse": "PASS",
+    "exit_code_propagation": "VALIDATED_0_2_3"
+  },
+  "determinism": "ENFORCED_UTF8_LF_SHA256",
+  "classification": "CRITICAL_INFRASTRUCTURE",
+  "changes_summary": {
+    "files_added": 69,
+    "files_modified": 0,
+    "lines_added": 6440,
+    "commits": 3
+  },
+  "artifacts": [
+    "scripts/_policy/policy_lib.py",
+    "scripts/_policy/check_scripts_policy.ps1",
+    "scripts/_policy/check_policy_md_is_derived.ps1",
+    "scripts/_policy/check_policy_manifest.ps1",
+    "scripts/_policy/check_path_constants.py",
+    "scripts/_policy/CONTRACT.md",
+    "scripts/_policy/requirements.txt",
+    ".github/workflows/scripts-policy.yml",
+    "docs/_canon/_agent/SCRIPTS_classification.md",
+    "docs/execution_tasks/artifacts/ARCH-SCRIPTS-GOV-001/ARCH_REQUEST_IMPLEMENTED.md"
+  ],
+  "git_commit": "f99a35a",
+  "arch_request_ref": "ARCH_REQUEST_IMPLEMENTED.md",
+  "implementation_phases": 10,
+  "merge_blockers_resolved": 6,
+  "operational_hardening": 4,
+  "post_merge_observations": 2,
+  "exit_codes": {
+    "0": "OK - all checks passed",
+    "2": "DRIFT/VIOLATION - policy violation detected",
+    "3": "HARNESS_ERROR - gate crash"
+  },
+  "dependencies": {
+    "python": "PyYAML==6.0.1, jsonschema==4.21.1",
+    "git_config": "core.autocrlf=false (documented)"
+  },
+  "notes_short": "Deterministic script governance system (SSOT YAML → Gates → CI) implemented with 22/22 items complete. Pre-merge validation: 4/4 PASS. Awaiting first CI execution (Windows + Ubuntu).",
+  "notes_detailed": "Complete implementation of deterministic script governance:\n\n1. SSOT: scripts.policy.yaml (versioned authority)\n2. DERIVED: SCRIPTS_classification.md (generated, anti-drift protected)\n3. Gates: 3 PowerShell gates (policy, anti-drift, manifest) + path consistency\n4. CI: Dual OS validation (Windows + Ubuntu) with pwsh support\n5. Determinism: UTF-8+LF normalization, SHA256 hashes, pinned dependencies\n6. Documentation: CONTRACT.md (280 lines) with paths, exit codes, maintenance\n\nValidation:\n- Pre-merge test suite: 4/4 PASS\n- Drift detection: exit=2 confirmed (not 3)\n- YAML parse: local validation successful\n- Path consistency: zero hardcode duplication\n\nTechnical Foundation:\n- policy_lib.py: 868 lines, 13 rules (HB001-HB013)\n- Exit code discipline: strict 0/2/3 propagation\n- Cross-platform hashing: EOL-normalized for determinism\n- Self-contained CI: Python inline (no jq dependency)\n\nPost-Merge Observations Implemented:\n- requirements.txt: PyYAML==6.0.1 pinned\n- CONTRACT.md section 3.4: core.autocrlf guidance\n\nFirst CI execution pending (run #2) with workflow dispatch enabled for dev-changes branch.",
+  "next_action": "Monitor first CI execution (Windows + Ubuntu) → Merge to main → Remove dev-changes from push trigger → Set required status checks"
+}
